@@ -1,0 +1,19 @@
+{
+  "name": "proyecto_integrador",
+  "version": "1.0.0",
+  "description": "Proyecto final para la Tecnicatura Universitaria en Programacion",
+  "main": "index.js",
+  "scripts": {
+    "dev": "nodemon index.js",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "devDependencies": {
+    "nodemon": "^3.1.10"
+  },
+  "dependencies": {
+    "express": "^5.1.0"
+  }
+}
