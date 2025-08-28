@@ -5,9 +5,9 @@ const medicamentoControllers = {}
 const getAllMedicamentos = async (req, res) => {
     try {
         const medicamentos = await Medicamento.find() 
-        res.json(medicamentos)
+        res.status(200).json(medicamentos)
     } catch (error) {
-        res.json({message: error.message})
+        res.sttaus(400).json({message: error.message})
     }
 }
 medicamentoControllers.getAllMedicamentos = getAllMedicamentos
@@ -26,9 +26,9 @@ const addMedicamento = async (req, res) => {
             stock
         })
         const nuevoMedicamento = await medicamento.save()
-        res.json(nuevoMedicamento)
+        res.status(201).json(nuevoMedicamento)
     } catch (error) {
-        res.json({message: error.message })
+        res.status(400).json({message: error.message })
     }
 }
 medicamentoControllers.addMedicamento = addMedicamento
