@@ -12,6 +12,10 @@ const getAllMedicamentos = async (req, res) => {
 }
 medicamentoControllers.getAllMedicamentos = getAllMedicamentos
 
+//const getMedicamentoByName = async (req, res) => {
+//    const { nombre } = req.queri.
+//1}
+
 const addMedicamento = async (req, res) => {
     const { nombre, codigoBarras, lote, fechaVencimiento, stock } = req.body 
     if ( !nombre || !codigoBarras || !lote || !fechaVencimiento || !stock){
