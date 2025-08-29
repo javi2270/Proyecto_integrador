@@ -14,7 +14,7 @@ const PORT = process.env.PORT ?? 3000
 
 app.listen(PORT, async () => {
     console.log(`Aplicacion iniciada en el puerto ${PORT}`)
-    await connectionMongo
+    await connectionMongo()
 })
 
  
