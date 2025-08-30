@@ -1,11 +1,13 @@
 const { Router } = require('express')
-const medicamentoControllers = require('../controllers/medicamento.controller')
+const medicamentoController = require('../controllers/medicamento.controller')
 const route = Router()
 
 
-route.get('/', medicamentoControllers.getAllMedicamentos)
-route.post('/', medicamentoControllers.addMedicamento)
-
+route.get('/', medicamentoController.getAllMedicamentos)
+route.post('/', medicamentoController.addMedicamento)
+route.get("/:codigoBarras", medicamentoController.getMedicamentoByCodigoBarras)
+route.put("/:codigoBarras", medicamentoController.updateMedicamento)
+route.delete("/:codigoBarras", medicamentoController.deleteMedicamento)
 
 module.exports = route 
 

@@ -1,7 +1,7 @@
 const express = require('express')
 require('dotenv').config()
 const route = require('./routes/medicamento.routes')
-const connectionMongo = require('./dbConnection/connection')
+const connectionMongo = require('./db/mongo.db')
 
 const app = express()
 
