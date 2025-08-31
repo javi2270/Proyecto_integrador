@@ -1,12 +1,12 @@
 const { Router } = require('express')
 const laboratorioController = require('../controllers/laboratorio.controller')
-const route = Router()
+const router = Router()
 
 
-route.get("/", laboratorioController.getAllLaboratorios)
-route.post("/", laboratorioController.addLaboratorio)
-route.get("/:nombre", laboratorioController.getLaboratorioByName)
-route.put("/:nombre", laboratorioController.updateLaboratorio)
-route.delete("/:nombre", laboratorioController.deleteLaboratorio)
+router.get("/", laboratorioController.getAllLaboratorios)
+router.post("/", laboratorioController.addLaboratorio)
+router.get("/:nombre", laboratorioController.getLaboratorioByName)
+router.put("/:nombre", laboratorioController.updateLaboratorio)
+router.delete("/:nombre", laboratorioController.deleteLaboratorio)
 
-module.exports = route 
+module.exports = router 

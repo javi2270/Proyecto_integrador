@@ -1,6 +1,6 @@
 const Laboratorio = require('../models/laboratorio.model')
 
-const laboratorioControllers = {}
+const laboratorioController = {}
 
 // Obtener todos los laboratorios
 const getAllLaboratorios = async (req, res) => {
@@ -11,7 +11,7 @@ const getAllLaboratorios = async (req, res) => {
         res.status(400).json({ message: error.message })
     }
 }
-laboratorioControllers.getAllLaboratorios = getAllLaboratorios
+laboratorioController.getAllLaboratorios = getAllLaboratorios
 
 // Crear un laboratorio
 const addLaboratorio = async (req, res) => {
@@ -29,7 +29,7 @@ const addLaboratorio = async (req, res) => {
         res.status(400).json({ message: error.message })
     }
 }
-laboratorioControllers.addLaboratorio = addLaboratorio
+laboratorioController.addLaboratorio = addLaboratorio
 
 // Obtener laboratorio por NOMBRE
 const getLaboratorioByName = async (req, res) => {
@@ -43,7 +43,7 @@ const getLaboratorioByName = async (req, res) => {
         res.status(400).json({ message: error.message })
     }
 }
-laboratorioControllers.getLaboratorioByName = getLaboratorioByName
+laboratorioController.getLaboratorioByName = getLaboratorioByName
 
 // Actualizar laboratorio por NOMBRE
 const updateLaboratorio = async (req, res) => {
@@ -62,7 +62,7 @@ const updateLaboratorio = async (req, res) => {
         res.status(400).json({ message: error.message })
     }
 }
-laboratorioControllers.updateLaboratorio = updateLaboratorio
+laboratorioController.updateLaboratorio = updateLaboratorio
 
 // Eliminar laboratorio por NOMBRE
 const deleteLaboratorio = async (req, res) => {
@@ -76,6 +76,6 @@ const deleteLaboratorio = async (req, res) => {
         res.status(400).json({ message: error.message })
     }
 }
-laboratorioControllers.deleteLaboratorio = deleteLaboratorio
+laboratorioController.deleteLaboratorio = deleteLaboratorio
 
-module.exports = laboratorioControllers
+module.exports = laboratorioController

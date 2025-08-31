@@ -1,88 +1,78 @@
-const Medicamento = require('../models/medicamento.model')
+const medicamentoService = require("../services/medicamento.service")
 
-const medicamentoControllers = {}
-
-// Obtener todos los medicamentos
+// Obtener todos
 const getAllMedicamentos = async (req, res) => {
     try {
-        const medicamentos = await Medicamento.find()
+        const medicamentos = await medicamentoService.getAll()
         res.status(200).json(medicamentos)
     } catch (error) {
         res.status(400).json({ message: error.message })
     }
 }
-medicamentoControllers.getAllMedicamentos = getAllMedicamentos
 
-// Crear un medicamento
+// Crear
 const addMedicamento = async (req, res) => {
     const { nombre, codigoBarras, lote, fechaVencimiento, stock } = req.body 
     if (!nombre || !codigoBarras || !lote || !fechaVencimiento || !stock) {
-        return res.status(400).json({ message: 'Los campos son obligatorios.' })
+        return res.status(400).json({ message: "Los campos son obligatorios." })
     }
     try {
-        const medicamento = new Medicamento({
-            nombre,
-            codigoBarras,
-            lote,
-            fechaVencimiento,
-            stock
-        })
-        const nuevoMedicamento = await medicamento.save()
+        const nuevoMedicamento = await medicamentoService.create({ nombre, codigoBarras, lote, fechaVencimiento, stock })
         res.status(201).json(nuevoMedicamento)
     } catch (error) {
         res.status(400).json({ message: error.message })
     }
 }
-medicamentoControllers.addMedicamento = addMedicamento
 
-// Obtener medicamento por código de barras
+// Buscar por código
 const getMedicamentoByCodigoBarras = async (req, res) => {
     try {
-        const medicamento = await Medicamento.findOne({ codigoBarras: req.params.codigoBarras })
-        if (!medicamento) {
-            return res.status(404).json({ message: "Medicamento no encontrado" })
-        }
+        const medicamento = await medicamentoService.getByCodigoBarras(req.params.codigoBarras)
+        if (!medicamento) return res.status(404).json({ message: "Medicamento no encontrado" })
         res.status(200).json(medicamento)
     } catch (error) {
         res.status(400).json({ message: error.message })
     }
 }
-medicamentoControllers.getMedicamentoByCodigoBarras = getMedicamentoByCodigoBarras
 
-// Actualizar medicamento por código de barras
-const updateMedicamento = async (req, res) => {
-    const { nombre, lote, fechaVencimiento, stock } = req.body
+// Buscar por nombre
+const getMedicamentoByNombre = async (req, res) => {
     try {
-        const medicamento = await Medicamento.findOneAndUpdate(
-            { codigoBarras: req.params.codigoBarras },
-            { nombre, lote, fechaVencimiento, stock },
-            { new: true, runValidators: true }
-        )
-        if (!medicamento) {
-            return res.status(404).json({ message: "Medicamento no encontrado" })
-        }
+        const medicamento = await medicamentoService.getByNombre(req.params.nombre)
+        if (!medicamento) return res.status(404).json({ message: "Medicamento no encontrado" })
         res.status(200).json(medicamento)
     } catch (error) {
         res.status(400).json({ message: error.message })
     }
 }
-medicamentoControllers.updateMedicamento = updateMedicamento
 
-// Eliminar medicamento por código de barras
+// Actualizar
+const updateMedicamento = async (req, res) => {
+    try {
+        const medicamento = await medicamentoService.update(req.params.codigoBarras, req.body)
+        if (!medicamento) return res.status(404).json({ message: "Medicamento no encontrado" })
+        res.status(200).json(medicamento)
+    } catch (error) {
+        res.status(400).json({ message: error.message })
+    }
+}
+
+// Eliminar
 const deleteMedicamento = async (req, res) => {
     try {
-        const medicamento = await Medicamento.findOneAndDelete({ codigoBarras: req.params.codigoBarras })
-        if (!medicamento) {
-            return res.status(404).json({ message: "Medicamento no encontrado" })
-        }
+        const medicamento = await medicamentoService.remove(req.params.codigoBarras)
+        if (!medicamento) return res.status(404).json({ message: "Medicamento no encontrado" })
         res.status(200).json({ message: "Medicamento eliminado correctamente" })
     } catch (error) {
         res.status(400).json({ message: error.message })
     }
 }
-medicamentoControllers.deleteMedicamento = deleteMedicamento
 
-module.exports = medicamentoControllers
-
-
-
+module.exports = {
+    getAllMedicamentos,
+    addMedicamento,
+    getMedicamentoByCodigoBarras,
+    getMedicamentoByNombre,
+    updateMedicamento,
+    deleteMedicamento
+}
