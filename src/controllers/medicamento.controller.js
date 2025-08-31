@@ -12,39 +12,40 @@ const getAllMedicamentos = async (req, res) => {
 
 // Crear
 const addMedicamento = async (req, res) => {
-    const { nombre, codigoBarras, lote, fechaVencimiento, stock } = req.body 
-    if (!nombre || !codigoBarras || !lote || !fechaVencimiento || !stock) {
-        return res.status(400).json({ message: "Los campos son obligatorios." })
-    }
     try {
-        const nuevoMedicamento = await medicamentoService.create({ nombre, codigoBarras, lote, fechaVencimiento, stock })
+        const nuevoMedicamento = await medicamentoService.create(req.body)
         res.status(201).json(nuevoMedicamento)
     } catch (error) {
         res.status(400).json({ message: error.message })
     }
 }
 
-// Buscar por código
-const getMedicamentoByCodigoBarras = async (req, res) => {
-    try {
-        const medicamento = await medicamentoService.getByCodigoBarras(req.params.codigoBarras)
-        if (!medicamento) return res.status(404).json({ message: "Medicamento no encontrado" })
-        res.status(200).json(medicamento)
-    } catch (error) {
-        res.status(400).json({ message: error.message })
-    }
-}
+// Buscar 
+const getMedicamento = async (req, res) => {
+    const { codigoBarras, nombre } = req.query;
 
-// Buscar por nombre
-const getMedicamentoByNombre = async (req, res) => {
-    try {
-        const medicamento = await medicamentoService.getByNombre(req.params.nombre)
-        if (!medicamento) return res.status(404).json({ message: "Medicamento no encontrado" })
-        res.status(200).json(medicamento)
-    } catch (error) {
-        res.status(400).json({ message: error.message })
+    // Si no se proporciona ningún parámetro de búsqueda, devuelve un error.
+    if (!codigoBarras && !nombre) {
+        return res.status(400).json({ message: "Debe proporcionar un 'codigoBarras' o 'nombre' para la búsqueda." });
     }
-}
+    try {
+        let medicamento;
+        // Prioriza la búsqueda por código de barras si ambos son proporcionados
+        if (codigoBarras) {
+            medicamento = await medicamentoService.getByCodigoBarras(codigoBarras);
+        } else {
+            medicamento = await medicamentoService.getByNombre(nombre);
+        }
+
+        if (!medicamento) {
+            return res.status(404).json({ message: "Medicamento no encontrado" });
+        }
+
+        res.status(200).json(medicamento);
+    } catch (error) {
+        res.status(500).json({ message: error.message });
+    }
+};
 
 // Actualizar
 const updateMedicamento = async (req, res) => {
@@ -71,8 +72,7 @@ const deleteMedicamento = async (req, res) => {
 module.exports = {
     getAllMedicamentos,
     addMedicamento,
-    getMedicamentoByCodigoBarras,
-    getMedicamentoByNombre,
+    getMedicamento,
     updateMedicamento,
     deleteMedicamento
 }

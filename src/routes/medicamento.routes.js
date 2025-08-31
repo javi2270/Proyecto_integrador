@@ -6,8 +6,7 @@ const router = Router()
 
 router.get('/', medicamentoController.getAllMedicamentos)
 router.post('/', validarMedicamento, medicamentoController.addMedicamento)
-router.get("/:codigoBarras", medicamentoController.getMedicamentoByCodigoBarras)
-router.get("/:nombre", medicamentoController.getMedicamentoByNombre)
+router.get("/buscar", medicamentoController.getMedicamento);
 router.put("/:codigoBarras", validarActualizacionMedicamento, medicamentoController.updateMedicamento)
 router.delete("/:codigoBarras", medicamentoController.deleteMedicamento)
 

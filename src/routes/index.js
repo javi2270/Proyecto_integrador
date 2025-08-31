@@ -5,9 +5,9 @@ const ventaRoute = require('./venta.routes')
 
 const router = Router()
 
-router.use('medicamentos', medicamentoRoute)
-router.use('laboratorios', laboratorioRoute)
-router.use('vantas', ventaRoute)
+router.use('/medicamentos', medicamentoRoute)
+router.use('/laboratorios', laboratorioRoute)
+router.use('/ventas', ventaRoute)
 
 
 
