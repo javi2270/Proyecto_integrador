@@ -69,10 +69,37 @@ const deleteMedicamento = async (req, res) => {
     }
 }
 
+// Controlador para registrar ingreso de stock
+const registrarIngresoStock = async (req, res) => {
+    try {
+        const { codigoBarras } = req.params;
+        const { cantidad } = req.body;
+
+        if (typeof cantidad !== 'number' || !Number.isInteger(cantidad) || cantidad <= 0) {
+            return res.status(400).json({ message: "La 'cantidad' es obligatoria y debe ser un número entero positivo." });
+        }
+
+        const medicamentoActualizado = await medicamentoService.addStock(codigoBarras, cantidad);
+
+        if (!medicamentoActualizado) {
+            return res.status(404).json({ message: "Medicamento no encontrado con el código de barras proporcionado." });
+        }
+
+        res.status(200).json({
+            message: "Stock actualizado correctamente.",
+            medicamento: medicamentoActualizado
+        });
+
+    } catch (error) {
+        res.status(500).json({ message: "Error interno del servidor.", error: error.message });
+    }
+};
+
 module.exports = {
     getAllMedicamentos,
     addMedicamento,
     getMedicamento,
     updateMedicamento,
-    deleteMedicamento
+    deleteMedicamento,
+    registrarIngresoStock
 }

@@ -35,5 +35,16 @@ const remove = async (codigoBarras) => {
     return await Medicamento.findOneAndDelete({ codigoBarras })
 }
 
-module.exports = { getAll, create, getByCodigoBarras, getByNombre, update, remove }
+// Añadir stock a un medicamento existente
+const addStock = async (codigoBarras, cantidad) => {
+    // Usamos findOneAndUpdate para hacer la operación más atómica
+    // $inc incrementa un campo por un valor específico
+    return await Medicamento.findOneAndUpdate(
+        { codigoBarras },
+        { $inc: { stock: cantidad } },
+        { new: true, runValidators: true } // new: true devuelve el documento actualizado
+    );
+};
+
+module.exports = { getAll, create, getByCodigoBarras, getByNombre, update, remove, addStock }
 

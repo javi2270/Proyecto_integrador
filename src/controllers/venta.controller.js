@@ -1,5 +1,6 @@
 const { Medicamento, Venta } = require('../models/index')
-const { findMedicamento } = require('../services/medicamento.service') 
+const medicamentoService = require('../services/medicamento.service') 
+const alertaService = require('../services/alerta.service'); // Importamos el nuevo servicio
 
 const ventaController = {}
 
@@ -11,30 +12,38 @@ const addVenta = async (req, res) => {
             return res.status(400).json({ message: "El identificador y una cantidad valida (mayor que 0) son obligatorios." })
         }
 
-        // Buscar medicamento por código de barras o nombre
+        // --- Lógica de Venta Existente ---
+        const medicamento = await medicamentoService.getByCodigoBarras(identificador) || await medicamentoService.getByNombre(identificador);
 
-        const medicamento = await findMedicamento(identificador)
 
         if (!medicamento) {
             return res.status(404).json({ message: "Medicamento no encontrado." })
         }
 
-        // Validar stock
         if (medicamento.stock < cantidad) {
             return res.status(400).json({ message: "Stock insuficiente." })
         }
 
-        // Restar stock
         medicamento.stock -= cantidad
         await medicamento.save()
 
-        // Registrar venta
         const nuevaVenta = new Venta({
             medicamento: medicamento._id,
             cantidad,
             motivo: motivo || "Venta"
         })
         await nuevaVenta.save()
+
+        // --- NUEVA LÓGICA DE ALERTA ---
+        // Después de guardar, verificamos si el stock cayó por debajo del mínimo
+        if (medicamento.stock < medicamento.stockMinimo) {
+            await alertaService.crearAlertaSiNoExiste({
+                medicamento: medicamento._id,
+                tipo: 'Bajo Stock',
+                mensaje: `El stock de ${medicamento.nombre} (${medicamento.codigoBarras}) ha caído por debajo del mínimo. Stock actual: ${medicamento.stock}.`
+            });
+        }
+        // --- FIN DE LA NUEVA LÓGICA ---
 
         res.status(201).json({ message: "Venta registrada con éxito", venta: nuevaVenta })
     } catch (error) {
@@ -59,7 +68,7 @@ const getVentasByMedicamento = async (req, res) => {
     try {
         const { identificador } = req.params
 
-        const medicamento = await findMedicamento(identificador)
+        const medicamento = await medicamentoService.getByCodigoBarras(identificador) || await medicamentoService.getByNombre(identificador);
 
         if (!medicamento) {
             return res.status(404).json({ message: "Medicamento no encontrado." })
