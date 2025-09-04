@@ -3,7 +3,7 @@ const Alerta = require('../models/alerta.model');
 const alertaController = {};
 
 // Obtener todas las alertas no leídas
-alertaController.getAlertasActivas = async (req, res) => {
+const getAlertasActivas = async (req, res) => {
     try {
         const alertas = await Alerta.find({ leida: false })
             .populate('medicamento', 'nombre codigoBarras stock stockMinimo')
@@ -13,9 +13,10 @@ alertaController.getAlertasActivas = async (req, res) => {
         res.status(500).json({ message: "Error al obtener las alertas.", error: error.message });
     }
 };
+alertaController.getAlertasActivas = getAlertasActivas
 
 // Marcar una alerta como leída
-alertaController.marcarComoLeida = async (req, res) => {
+const marcarComoLeida = async (req, res) => {
     try {
         const { id } = req.params;
         const alerta = await Alerta.findByIdAndUpdate(id, { leida: true }, { new: true });
@@ -29,5 +30,7 @@ alertaController.marcarComoLeida = async (req, res) => {
         res.status(500).json({ message: "Error al actualizar la alerta.", error: error.message });
     }
 };
+alertaController.marcarComoLeida = marcarComoLeida
 
-module.exports = alertaController;
+
+module.exports = alertaController
