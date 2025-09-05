@@ -7,7 +7,7 @@ const Rol = require('./models/rol.model')
 const crearRolesIniciales = async () => {
     try {
 // cuento cuantos documentos hay en la coleccion (roles)
-    const count = Rol.estimatedDocumentCount()
+    const count = await Rol.estimatedDocumentCount()
 // si hay roles no hago nada y salgo de la funcion
     if (count > 0) return
 // si no hay roles los creo de forma simultanea
@@ -17,7 +17,7 @@ const crearRolesIniciales = async () => {
     ])
     console.log('Valores iniciales creados', values.map(rol => rol.nombre)) 
     } catch (error) {
-        console.error('Error al crear los valores iniciales.', error)
+            console.error('Error al crear los valores iniciales.', error)
     }
 }
 
