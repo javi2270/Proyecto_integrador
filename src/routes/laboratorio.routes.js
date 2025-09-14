@@ -4,9 +4,9 @@ const router = Router()
 
 
 router.get("/", laboratorioController.getAllLaboratorios)
-router.post("/", laboratorioController.addLaboratorio)
+router.post("/", [validarToken, esAdministrador], laboratorioController.addLaboratorio)
 router.get("/:nombre", laboratorioController.getLaboratorioByName)
-router.put("/:nombre", laboratorioController.updateLaboratorio)
-router.delete("/:nombre", laboratorioController.deleteLaboratorio)
+router.put("/:nombre", [validarToken, esAdministrador], laboratorioController.updateLaboratorio)
+router.delete("/:nombre", [validarToken, esAdministrador], laboratorioController.deleteLaboratorio)
 
 module.exports = router 
