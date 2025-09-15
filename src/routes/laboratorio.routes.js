@@ -1,5 +1,6 @@
 const { Router } = require('express')
 const laboratorioController = require('../controllers/laboratorio.controller')
+const { validarToken, esAdministrador } = require('../middlewares/auth.validator')
 const router = Router()
 
 

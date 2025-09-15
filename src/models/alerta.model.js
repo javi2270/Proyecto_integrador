@@ -1,10 +1,10 @@
 const mongoose = require('mongoose')
 
 const alertaSchema = new mongoose.Schema({
-    medicamento: { type: mongoose.Schema.Types.ObjectId, ref: "Medicamento", required: true },
+    medicamento: { type: mongoose.Schema.Types.ObjectId, ref: "Medicamento", required: false },
     tipo: { 
         type: String, 
-        enum: ['Bajo Stock', 'Vencimiento Próximo'], // Podremos reusar este modelo para futuras alertas
+        enum: ['Bajo Stock', 'Vencimiento Próximo', 'Registro Temperatura'], // Podremos reusar este modelo para futuras alertas
         required: true 
     },
     mensaje: { type: String, required: true },
