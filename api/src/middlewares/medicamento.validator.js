@@ -3,7 +3,7 @@ const { crearMedicamentoSchema, actualizarMedicamentoSchema } = require('../sche
 const validarMedicamento = (req, res, next) => {
     const { error } = crearMedicamentoSchema.validate(req.body)
     if (error) {
-        return res.status(400).jason({ 
+        return res.status(400).json({ 
             error: 'Error de validacion', 
             mensaje: error.details[0].message
         })
@@ -14,7 +14,7 @@ const validarMedicamento = (req, res, next) => {
 const validarActualizacionMedicamento = (req, res, next) => {
     const { error } = actualizarMedicamentoSchema.validate(req.body)
     if (error) {
-        return res.status(400).jason({
+        return res.status(400).json({
             error: 'Error al actualizar',
             mensaje: error.details[0].message
         })
