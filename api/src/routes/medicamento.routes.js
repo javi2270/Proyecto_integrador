@@ -5,9 +5,9 @@ const { validarToken, esAdministrador } = require('../middlewares/auth.validator
 const router = Router()
 
 
-router.get('/', medicamentoController.getAllMedicamentos)
+router.get('/all', medicamentoController.getAllMedicamentos)
 router.post('/', validarMedicamento, medicamentoController.addMedicamento)
-router.get("/:buscar", medicamentoController.getMedicamento);
+router.get('/', medicamentoController.getMedicamento);
 
 router.post("/:codigoBarras/ingreso-stock", medicamentoController.registrarIngresoStock);
 

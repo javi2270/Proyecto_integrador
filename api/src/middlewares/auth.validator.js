@@ -12,10 +12,11 @@ const validarToken = async (req, res, next) => {
         const usuario = await Usuario.findById(decoded.id, {password: 0})
         if (!usuario) {
             return res.status(404).json({message: 'Usuario no encontrado.'})
+        }
         req.usuario = usuario
         next()
-        }
-    } catch (error) {
+    } 
+    catch (error) {
         console.error('Token invalido:', error)
         res.status(401).json({message: 'EL token es invalido.'})
     }
