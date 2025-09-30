@@ -10,7 +10,7 @@ const validarToken = async (req, res, next) => {
         }
         const tokenPuro = token.replace('Bearer ', '')
         const decoded = jsonwebtoken.verify(tokenPuro, process.env.JWT_SECRET)
-        const usuario = await Usuario.findById(decoded.id, {password: 0})
+        const usuario = await Usuario.findById(decoded.id, {password: 0}).populate('rol')
         if (!usuario) {
             return res.status(404).json({message: 'Usuario no encontrado.'})
         }

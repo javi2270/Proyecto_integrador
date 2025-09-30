@@ -68,7 +68,7 @@ const getVentasByMedicamento = async (req, res) => {
     try {
         const { identificador } = req.params
 
-        const medicamento = await medicamentoService.getByCodigoBarras(identificador) || await medicamentoService.getByNombre(identificador);
+        const medicamento = await medicamentoService.getByIdentificador(identificador)
 
         if (!medicamento) {
             return res.status(404).json({ message: "Medicamento no encontrado." })

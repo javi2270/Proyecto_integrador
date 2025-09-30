@@ -1,4 +1,4 @@
-const Temperatura = require('../models')
+const Temperatura = require('../models/temperatura.model')
 
 const temperaturaService = {}
 

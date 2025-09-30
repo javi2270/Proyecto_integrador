@@ -7,7 +7,8 @@ const medicamentoSchema = new mongoose.Schema({
   fechaVencimiento: { type: Date, required: true },
   stock: { type: Number, required: true, min: 0 },
   stockMinimo: { type: Number, default: 0 }, // RF5 y RF11
-  laboratorio: { type: mongoose.Schema.Types.ObjectId, ref: "Laboratorio" }
+  laboratorio: { type: mongoose.Schema.Types.ObjectId, ref: "Laboratorio" },
+  activo: { type: Boolean, default: true } 
 }, { timestamps: true });
 
 

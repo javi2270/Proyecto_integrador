@@ -1,4 +1,4 @@
-const Alerta = require('../models');
+const Alerta = require('../models/alerta.model');
 
 const alertaService = {};
 
