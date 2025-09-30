@@ -1,9 +1,9 @@
-const Alerta = require('../models/alerta.model');
+const Alerta = require('../models');
 
 const alertaService = {};
 
 // Crear una alerta si no existe una activa del mismo tipo para el mismo medicamento
-alertaService.crearAlertaSiNoExiste = async (datosAlerta) => {
+const crearAlertaSiNoExiste = async (datosAlerta) => {
     try {
         const alertaExistente = await Alerta.findOne({
             medicamento: datosAlerta.medicamento,
@@ -27,4 +27,6 @@ alertaService.crearAlertaSiNoExiste = async (datosAlerta) => {
     }
 };
 
-module.exports = alertaService;
+alertaService.crearAlertaSiNoExiste = crearAlertaSiNoExiste
+
+module.exports = alertaService

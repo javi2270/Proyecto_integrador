@@ -1,5 +1,5 @@
 const cron = require('node-cron')
-const Medicamento = require('../models/medicamento.model')
+const Medicamento = require('../models')
 const alertaService = require('./alerta.service')
 
 // Terea que se ejecuta todos los dias a las 8:00 AM 

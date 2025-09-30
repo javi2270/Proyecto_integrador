@@ -4,6 +4,7 @@ const laboratorioRoute = require('./laboratorio.routes')
 const ventaRoute = require('./venta.routes')
 const alertaRoute = require('./alerta.routes')
 const authRoute = require('./auth.routes')
+const temperaturaRoute = require('./temperatura.route')
 
 const router = Router()
 
@@ -12,6 +13,7 @@ router.use('/laboratorios', laboratorioRoute)
 router.use('/ventas', ventaRoute)
 router.use('/alerta', alertaRoute) 
 router.use('/auth', authRoute)
+router.use('/temperatura', temperaturaRoute)
 
 
 

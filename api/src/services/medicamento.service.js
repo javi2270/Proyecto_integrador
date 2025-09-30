@@ -1,4 +1,4 @@
-const Medicamento = require("../models/medicamento.model")
+const Medicamento = require("../models")
 
 // Obtener todos los medicamentos
 const getAll = async () => {

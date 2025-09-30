@@ -1,6 +1,6 @@
 const express = require('express')
 require('dotenv').config()
-const routes = require('./routes/index')
+const routes = require('./routes')
 const connectionMongo = require('./db/mongo.db')
 const Rol = require('./models/rol.model')
 

@@ -1,5 +1,6 @@
 const jsonwebtoken = require('jsonwebtoken')
 const { Rol, Usuario} = require('../models/index')
+const ADMINISTRADOR = 'Administrador'
 
 const validarToken = async (req, res, next) => {
     try {
@@ -24,7 +25,7 @@ const validarToken = async (req, res, next) => {
 
 const esAdministrador = async (req, res, next) => {
     try {
-        if (req.usuario && req.usuario.rol.nombre === 'Administrador') {
+        if (req.usuario && req.usuario.rol.nombre === ADMINISTRADOR ) {
             next()
         }
         else {

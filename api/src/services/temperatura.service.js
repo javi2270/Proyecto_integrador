@@ -1,9 +1,9 @@
-const Temperatura = require('../models/temperatura.model')
+const Temperatura = require('../models')
 
 const temperaturaService = {}
 
 const registrarTemperatura = async (datos) => {
-    // extraigo los datos necesarios
+    // extraigo los datos necesarios con desestructuracion
     const { valor, usuarioId } = datos
 
     // creo una nueva instancia del modelo temperatura
