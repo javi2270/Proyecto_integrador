@@ -2,7 +2,7 @@ const Medicamento = require("../models/medicamento.model")
 
 // Obtener todos los medicamentos
 const getAll = async () => {
-    return await Medicamento.findOne()
+    return await Medicamento.find({ activo: true })
 }
 
 // Crear un medicamento
@@ -14,12 +14,18 @@ const create = async (data) => {
 
 // Buscar medicamento por código de barras
 const getByCodigoBarras = async (codigoBarras) => {
-    return await Medicamento.findOne({ codigoBarras })
+    return await Medicamento.findOne(
+        { codigoBarras },
+        { activo: true }
+    )
 }
 
 // Buscar medicamento por nombre
 const getByNombre = async (nombre) => {
-    return await Medicamento.findOne({ nombre: { $regex: nombre, $options: 'i'} })
+    return await Medicamento.findOne(
+        { nombre: { $regex: nombre, $options: 'i'} },
+        { activo: true}
+    )
 }
 
 const getByIdentificador = async (identificador) => {
@@ -35,13 +41,18 @@ const update = async (codigoBarras, data) => {
     return await Medicamento.findOneAndUpdate(
         { codigoBarras },
         data,
-        { new: true, runValidators: true }
+        { new: true, runValidators: true },
+        { activo: true }
     )
 }
 
 // Eliminar medicamento
 const remove = async (codigoBarras) => {
-    return await Medicamento.findOneAndUpdate({ activo: false })
+    return await Medicamento.findOneAndUpdate(
+        { codigoBarras: codigoBarras},
+        { activo: false },
+        { new: true }
+    )
 }
 
 // Añadir stock a un medicamento existente
@@ -51,6 +62,7 @@ const addStock = async (codigoBarras, cantidad) => {
     return await Medicamento.findOneAndUpdate(
         { codigoBarras },
         { $inc: { stock: cantidad } },
+        { activo: true },
         { new: true, runValidators: true } // new: true devuelve el documento actualizado
     );
 };

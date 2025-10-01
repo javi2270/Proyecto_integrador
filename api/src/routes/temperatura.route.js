@@ -4,6 +4,6 @@ const { validarToken, esAdministrador } = require('../middlewares/auth.validator
 const router = Router()
 
 
-router.post('/', [ validarToken, esAdministrador], temperaturaController)
+router.post('/', [ validarToken, esAdministrador], temperaturaController.addTemperatura)
 
 module.exports = router

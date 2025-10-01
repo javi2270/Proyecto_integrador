@@ -1,4 +1,4 @@
-const { temperaturaService } = require('../services/temperatura.service')
+const temperaturaService  = require('../services/temperatura.service')
 
 const temperaturaController = {}
 

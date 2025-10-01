@@ -1,6 +1,17 @@
 const jsonwebtoken = require('jsonwebtoken')
 const { Rol, Usuario} = require('../models/index')
+const { required } = require('joi')
+const { registroSchema } = require('../schemas/auth.schemas')
+
 const ADMINISTRADOR = 'Administrador'
+
+const validarRegistro = (req, res, next) => {
+    const { error } = registroSchema.validate(req.body)
+    if (error){
+        return res.status(400).json({message: error.details[0].message})
+    }
+    next()
+}
 
 const validarToken = async (req, res, next) => {
     try {
@@ -36,5 +47,5 @@ const esAdministrador = async (req, res, next) => {
     }
 }
 
-module.exports = { validarToken, esAdministrador }
+module.exports = { validarToken, esAdministrador, validarRegistro }
 
