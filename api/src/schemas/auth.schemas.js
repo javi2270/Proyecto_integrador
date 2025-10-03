@@ -13,4 +13,4 @@ const registroSchema = joi.object({
     })
 })
 
-module.exports = registroSchema
+module.exports = { registroSchema } 

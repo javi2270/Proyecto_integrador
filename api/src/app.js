@@ -3,6 +3,7 @@ require('dotenv').config()
 const routes = require('./routes')
 const connectionMongo = require('./db/mongo.db')
 const Rol = require('./models/rol.model')
+const { iniciarRevisionVencimientos } = require('./services/cron.service')
 
 const crearRolesIniciales = async () => {
     try {
@@ -34,6 +35,9 @@ app.listen(PORT, async () => {
     console.log(`Aplicacion iniciada en el puerto ${PORT}`)
     await connectionMongo
     await crearRolesIniciales()
+    // Inicio las tareas programadas
+    iniciarRevisionVencimientos()
+    iniciarAlertaTemperaturaMensual()
 })
 
  
