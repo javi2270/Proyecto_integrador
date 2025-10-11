@@ -18,3 +18,4 @@ const registrarTemperatura = async (datos) => {
 temperaturaService.registrarTemperatura = registrarTemperatura
 
 module.exports = temperaturaService
+

@@ -1,25 +1,23 @@
-const Alerta = require('../models/alerta.model');
+const alertaService = require('../services/alerta.service');
 
 const alertaController = {};
 
 // Obtener todas las alertas no leídas
 const getAlertasActivas = async (req, res) => {
     try {
-        const alertas = await Alerta.find({ leida: false })
-            .populate('medicamento', 'nombre codigoBarras stock stockMinimo')
-            .sort({ createdAt: -1 }); // Las más nuevas primero
+        const alertas = await alertaService.getAlertasActivas();
         res.status(200).json(alertas);
     } catch (error) {
         res.status(500).json({ message: "Error al obtener las alertas.", error: error.message });
     }
 };
-alertaController.getAlertasActivas = getAlertasActivas
+alertaController.getAlertasActivas = getAlertasActivas;
 
 // Marcar una alerta como leída
 const marcarComoLeida = async (req, res) => {
     try {
         const { id } = req.params;
-        const alerta = await Alerta.findByIdAndUpdate(id, { leida: true }, { new: true });
+        const alerta = await alertaService.marcarComoLeida(id);
 
         if (!alerta) {
             return res.status(404).json({ message: "Alerta no encontrada." });
@@ -30,7 +28,6 @@ const marcarComoLeida = async (req, res) => {
         res.status(500).json({ message: "Error al actualizar la alerta.", error: error.message });
     }
 };
-alertaController.marcarComoLeida = marcarComoLeida
+alertaController.marcarComoLeida = marcarComoLeida;
 
-
-module.exports = alertaController
+module.exports = alertaController;

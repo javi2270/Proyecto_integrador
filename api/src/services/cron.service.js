@@ -1,6 +1,7 @@
 const cron = require('node-cron')
 const Medicamento = require('../models/medicamento.model')
 const alertaService = require('./alerta.service')
+const Temperatura = require('../models/temperatura.model')
 
 // Terea que se ejecuta todos los dias a las 8:00 AM 
 const iniciarRevisionVencimientos = () => {
@@ -26,7 +27,7 @@ const iniciarRevisionVencimientos = () => {
 
 // Tarea para la alerta de temperatura mensual
 const iniciarAlertaTemperaturaMensual = () => {
-    cron.schedule('0 9 1 * *', async => {
+    cron.schedule('0 9 1 * *', async () => {
         console.log('Ejecutando revision mensual para alerta de temperatura...')
 
         try {
