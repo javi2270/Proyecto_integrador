@@ -35,7 +35,7 @@ const iniciarAlertaTemperaturaMensual = () => {
             const primerDiaDelMes = new Date(ahora.getFullYear(), ahora.getMonth(), 1)
             const ultimoDiaDelMes = new Date(ahora.getFullYear(), ahora.getMonth() + 1, 0)
             // 1. Buscamos si ya existe un registro de temperatura en el mes actual.
-            const registroExistente = Temperatura.findOne({
+            const registroExistente = await Temperatura.findOne({
                 createdAt: {
                     $gte: primerDiaDelMes, // Mayor o igual que el primer día del mes
                     $lte: ultimoDiaDelMes  // Menor o igual que el último día del mes

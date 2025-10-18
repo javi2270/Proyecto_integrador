@@ -7,3 +7,6 @@ const Usuario = require('./usuario.model')
 const Temperatura = require('./temperatura.model')
 
 const models = { Medicamento, Venta, Laboratorio, Alerta, Rol, Usuario, Temperatura }
+
+module.exports = models
+

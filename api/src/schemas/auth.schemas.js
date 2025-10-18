@@ -2,7 +2,7 @@ const joi = require('joi')
 
 const registroSchema = joi.object({
     nombre: joi.string().min(3).max(100).required(),
-    enmail: joi.string().email().required(),
+    email: joi.string().email().required(),
     password: joi.string()
     .min(8)
     .pattern(new RegExp('^(?=.*[a-z])(?=.*[A-Z])(?=.*\\d).+$'))
