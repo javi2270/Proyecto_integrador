@@ -117,14 +117,17 @@ Then('el medicamento {string} aparece en el listado de medicamentos', async func
   expect(medicamentoGuardado).to.not.be.null;
 });
 
-// --- Escenarios de error ---
+// --- Pasos para escenarios de error ---
 
 Then('el sistema muestra un mensaje de error {string}', function (expectedErrorMessage) {
-  expect(world.response.status).to.equal(400);
+  // Verificamos que la API respondió con un error 400 (Bad Request)
+  expect(world.response.status).to.equal(400); 
+  // Verificamos que el mensaje de error en la respuesta es el que esperábamos
   expect(world.response.body.mensaje).to.equal(expectedErrorMessage);
 });
 
 Then('el medicamento no aparece en el listado de medicamentos', async function () {
+  // Verificamos que no se haya creado ningún medicamento en la base de datos
   const count = await Medicamento.countDocuments();
   expect(count).to.equal(0);
 });

@@ -1,6 +1,5 @@
 const jsonwebtoken = require('jsonwebtoken')
 const { Rol, Usuario} = require('../models/index')
-const { required } = require('joi')
 const { registroSchema } = require('../schemas/auth.schemas')
 
 const ADMINISTRADOR = 'Administrador'
