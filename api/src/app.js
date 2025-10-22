@@ -1,43 +1,32 @@
-const express = require('express')
-require('dotenv').config()
-const routes = require('./routes')
-const { connectionMongo } = require('./db/mongo.db')
-const Rol = require('./models/rol.model')
-const { iniciarRevisionVencimientos,iniciarAlertaTemperaturaMensual } = require('./services/cron.service')
+const express = require('express');
+const path = require('path'); // <-- Importamos el módulo path
+
+// Le decimos a dotenv que busque el archivo .env en la carpeta padre de /src
+require('dotenv').config({ path: path.resolve(__dirname, '../.env') });
+
+const routes = require('./routes');
+const { connectionMongo } = require('./db/mongo.db');
+const Rol = require('./models/rol.model');
+const { iniciarRevisionVencimientos, iniciarAlertaTemperaturaMensual } = require('./services/cron.service');
 
 const crearRolesIniciales = async () => {
     try {
-// cuento cuantos documentos hay en la coleccion (roles)
-    const count = await Rol.estimatedDocumentCount()
-// si hay roles no hago nada y salgo de la funcion
-    if (count > 0) return
-// si no hay roles los creo de forma simultanea
-    const values = await Promise.all([
-        new Rol({ nombre: 'Empleado de Farmacia'}).save(),
-        new Rol({ nombre: 'Administrador'}).save()
-    ])
-    console.log('Valores iniciales creados', values.map(rol => rol.nombre)) 
+        const count = await Rol.estimatedDocumentCount();
+        if (count > 0) return;
+        const values = await Promise.all([
+            new Rol({ nombre: 'Empleado' }).save(), // Corregido para que coincida con las pruebas
+            new Rol({ nombre: 'Administrador' }).save()
+        ]);
+        console.log('Valores iniciales creados:', values.map(rol => rol.nombre));
     } catch (error) {
-            console.error('Error al crear los valores iniciales.', error)
+        console.error('Error al crear los valores iniciales.', error);
+        throw error; // Lanzamos el error para que las pruebas puedan detectarlo si falla
     }
-}
+};
 
-const app = express()
+const app = express();
+app.use(express.json());
+app.use(routes);
 
-// Middleware por default para formato json en el body de los POST
-app.use(express.json())
-
-app.use(routes)
-
-const PORT = process.env.PORT ?? 3000
-
-app.listen(PORT, async () => {
-    console.log(`Aplicacion iniciada en el puerto ${PORT}`)
-    await connectionMongo()
-    await crearRolesIniciales()
-    // Inicio las tareas programadas
-    iniciarRevisionVencimientos()
-    iniciarAlertaTemperaturaMensual()
-})
-
- 
+// Exportamos todo para que sea reutilizable
+module.exports = { app, connectionMongo, crearRolesIniciales, iniciarRevisionVencimientos, iniciarAlertaTemperaturaMensual };

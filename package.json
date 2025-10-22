@@ -1,0 +1,21 @@
+{
+  "name": "sgmr",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "test": "cucumber-js"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "devDependencies": {
+    "@cucumber/cucumber": "^12.2.0",
+    "chai": "^4.3.10",
+    "supertest": "^7.1.4",
+    "mongoose": "^8.18.0",
+    "bcryptjs": "^3.0.2",
+    "express": "^5.1.0",
+    "dotenv": "^17.2.1"
+  }
+}
