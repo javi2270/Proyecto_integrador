@@ -5,3 +5,5 @@ const rolSchema = new mongoose.Schema({
 })
 
 module.exports = mongoose.model('Rol', rolSchema)
+
+

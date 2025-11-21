@@ -8,3 +8,4 @@ const laboratorioSchema = new mongoose.Schema({
 }, { timestamps: true });
 
 module.exports = mongoose.model("Laboratorio", laboratorioSchema);
+

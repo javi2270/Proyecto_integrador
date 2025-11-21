@@ -7,3 +7,4 @@ const router = Router()
 router.post('/', [ validarToken, esAdministrador], temperaturaController.addTemperatura)
 
 module.exports = router
+

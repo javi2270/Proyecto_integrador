@@ -1,5 +1,5 @@
 const express = require('express');
-const path = require('path'); // <-- Importamos el módulo path
+const path = require('path')
 
 // Le decimos a dotenv que busque el archivo .env en la carpeta padre de /src
 require('dotenv').config({ path: path.resolve(__dirname, '../.env') });

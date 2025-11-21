@@ -8,3 +8,4 @@ const temperaturaSchema = new mongoose.Schema({
 
 
 module.exports = mongoose.model('Temperatura', temperaturaSchema)
+

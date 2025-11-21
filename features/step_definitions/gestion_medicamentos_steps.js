@@ -18,13 +18,9 @@ let world = {};
 
 // ================== HOOKS GLOBALES ==================
 
-BeforeAll(async () => {
-  await connectionMongo();
-});
+BeforeAll(async () => await connectionMongo())
 
-AfterAll(async () => {
-  await mongoose.connection.close();
-});
+AfterAll(async () => await mongoose.connection.close())
 
 // ================== HOOKS DE ESCENARIO ==================
 
