@@ -7,26 +7,37 @@ import {
   Spinner,
   Alert,
 } from "react-bootstrap";
+// Importamos los servicios
 import {
   getMedicamentos,
   deleteMedicamento,
+  addStock, // <--- IMPORTANTE
 } from "../services/medicamento.service";
 import { useAuth } from "../context/AuthContext";
 import { useNavigate } from "react-router-dom";
 
+// IMPORTAMOS EL MODAL (Si no pones esto, falla)
+import IngresoStockModal from "../components/IngresoStockModal";
+
 const MedicamentosPage = () => {
+  // Estados de datos
   const [medicamentos, setMedicamentos] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
 
-  // Hooks
+  // --- AQUÍ FALTABAN ESTAS LÍNEAS (Los Hooks) ---
+  const [showModal, setShowModal] = useState(false);      // Controla si se ve la ventana
+  const [selectedMed, setSelectedMed] = useState(null);   // Controla qué medicamento se edita
+  // -----------------------------------------------
+
+  // Hooks de router y auth
   const { usuario } = useAuth();
   const navigate = useNavigate();
 
-  // Verifico si es admin para mostrar las opciones extra
+  // Verifico si es admin
   const esAdmin = usuario?.rol?.nombre === "Administrador";
 
-  // Cargo datos al inicias
+  // Cargar datos al iniciar
   useEffect(() => {
     cargarDatos();
   }, []);
@@ -53,7 +64,7 @@ const MedicamentosPage = () => {
     ) {
       try {
         await deleteMedicamento(codigoBarras);
-        cargarDatos(); // recargo la lista para ver que se desaparecio
+        cargarDatos();
       } catch (err) {
         alert(
           "Error al eliminar:  " +
@@ -62,6 +73,24 @@ const MedicamentosPage = () => {
       }
     }
   };
+
+  // --- FUNCIONES PARA ABRIR EL MODAL ---
+  const handleOpenStock = (medicamento) => {
+    setSelectedMed(medicamento); // Guardamos cual clickeó
+    setShowModal(true);          // Mostramos la ventana
+  };
+
+  const handleSaveStock = async (codigoBarras, cantidad) => {
+    try {
+      await addStock(codigoBarras, cantidad);
+      await cargarDatos(); // Recargamos la tabla
+      alert("Stock actualizado correctamente");
+    } catch (err) {
+      console.error(err);
+      alert("Error al actualizar el stock");
+    }
+  };
+  // -------------------------------------
 
   if (loading)
     return (
@@ -75,7 +104,6 @@ const MedicamentosPage = () => {
       <div className="d-flex justify-content-between align-items-center mb-4">
         <h2>Inventario de Medicamentos</h2>
 
-        {/* Solo el Admin puede ver el botón de crear */}
         {esAdmin && (
           <Button
             variant="success"
@@ -98,7 +126,6 @@ const MedicamentosPage = () => {
             <tr>
               <th>Nombre</th>
               <th>Código</th>
-              <th>Laboratorio</th>
               <th>Stock</th>
               <th>Vencimiento</th>
               {esAdmin && <th>Acciones</th>}
@@ -109,16 +136,28 @@ const MedicamentosPage = () => {
               <tr key={med._id}>
                 <td className="fw-bold">{med.nombre}</td>
                 <td>{med.codigoBarras}</td>
-                {/* Si poblamos el laboratorio mostramos el nombre, sino 'N/A' */}
-                <td>{med.laboratorio?.nombre || "N/A"}</td>
+                
+                {/* COLUMNA STOCK CON BOTÓN */}
                 <td>
-                  {/* Badge rojo si está bajo de stock */}
-                  <Badge
-                    bg={med.stock <= med.stockMinimo ? "danger" : "success"}
-                  >
-                    {med.stock} u.
-                  </Badge>
+                  <div className="d-flex align-items-center gap-2">
+                    <Badge
+                      bg={med.stock <= med.stockMinimo ? "danger" : "success"}
+                    >
+                      {med.stock} u.
+                    </Badge>
+                    
+                    {/* Botón chiquito para sumar stock */}
+                    <Button 
+                        variant="outline-primary" 
+                        size="sm" 
+                        style={{padding: '0px 5px', fontSize:'0.8rem'}}
+                        onClick={() => handleOpenStock(med)}
+                    >
+                        + Stock
+                    </Button>
+                  </div>
                 </td>
+                
                 <td>{new Date(med.fechaVencimiento).toLocaleDateString()}</td>
 
                 {esAdmin && (
@@ -137,6 +176,16 @@ const MedicamentosPage = () => {
           </tbody>
         </Table>
       )}
+
+      {/* --- ESTO FALTABA: EL COMPONENTE MODAL EN EL RETURN --- */}
+      {/* Si no pones esto aquí, React no sabe dónde dibujar la ventana */}
+      <IngresoStockModal 
+        show={showModal} 
+        handleClose={() => setShowModal(false)}
+        medicamento={selectedMed}
+        onGuardar={handleSaveStock}
+      />
+      
     </Container>
   );
 };

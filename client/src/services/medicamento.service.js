@@ -1,22 +1,58 @@
-import axios from "../api/axios";
+import api from "../api/axios";
 
-// Obtengo todos los medicamentos
+const API_URL = "/api"; // Por si lo usas después, aunque api ya incluye /api
+
+// =========================
+//  Obtener todos los medicamentos
+// =========================
 export const getMedicamentos = async () => {
-  // La API tiene la ruta configurada en '/medicamentos/all'
-  const response = await axios.get("/medicamentos/all");
-  return response.data;
+  try {
+    const response = await api.get("/medicamentos/all"); // ✔ Ruta correcta
+    return response.data;
+  } catch (error) {
+    console.error("Error al obtener medicamentos:", error);
+    throw error;
+  }
 };
 
-// Eliminar mediamentos (solo administradores)
-export const deleteMedicamento = async (codigoBarras) => {
-  // La API espera el codigo de barras en la URL
-  const response = await axios.delete(`/medicamentos/${codigoBarras}`);
-  return response.data;
-};
-
-// Crear medicamentos
+// =========================
+//  Crear medicamento
+// =========================
 export const createMedicamento = async (datos) => {
-  // Hago una peticion POST a /medicamentos, envio el objeto 'datos' con toda la info del form
-  const response = axios.post("/medicamentos", datos);
-  return response.data;
+  try {
+    const response = await api.post("/medicamentos", datos);
+    return response.data;
+  } catch (error) {
+    console.error("Error al crear medicamento:", error);
+    throw error;
+  }
+};
+
+// =========================
+//  Eliminar medicamento (soft delete)
+// =========================
+export const deleteMedicamento = async (codigoBarras) => {
+  try {
+    const response = await api.delete(`/medicamentos/${codigoBarras}`);
+    return response.data;
+  } catch (error) {
+    console.error("Error al eliminar medicamento:", error);
+    throw error;
+  }
+};
+
+// =========================
+//  Agregar stock
+// =========================
+export const addStock = async (codigoBarras, cantidad) => {
+  try {
+    const response = await api.post(
+      `/medicamentos/${codigoBarras}/ingreso-stock`,
+      { cantidad: Number(cantidad) }
+    );
+    return response.data;
+  } catch (error) {
+    console.error("Error al agregar stock:", error);
+    throw error;
+  }
 };

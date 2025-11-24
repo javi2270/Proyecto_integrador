@@ -1,41 +1,35 @@
-import { Route, Routes, Navigate } from 'react-router-dom'
-import { useAuth } from './context/AuthContext'
-import LoginPage from './pages/LoginPage'
-import DashboardPage from './pages/DashboardPage'
-import RutaProtegida from './components/RutaProtegida'
-import RegisterPage from './pages/RegisterPage'
-import AlertasPage from './pages/alertasPage'
-import MedicamentosPage from './pages/MedicamentosPage'
+import { Route, Routes, Navigate } from "react-router-dom";
+import { useAuth } from "./context/AuthContext";
+import LoginPage from "./pages/LoginPage";
+import DashboardPage from "./pages/DashboardPage";
+import RutaProtegida from "./components/RutaProtegida";
+import RegisterPage from "./pages/RegisterPage";
+import AlertasPage from "./pages/AlertasPage";
+import MedicamentosPage from "./pages/MedicamentosPage";
+import NuevoMedicamentoPage from "./pages/NuevoMedicamentoPage";
 
 function App() {
-  // Leo el estado de autenticacion desde Context 
-  const { isAuthenticated, loading } = useAuth()
+  // Leo el estado de autenticacion desde Context
+  const { isAuthenticated, loading } = useAuth();
   // Manejo de carga ( evita que la app parpadee y muestre el loading por 0.1seg)
-  if ( loading ){
-    return <div>Cargando...</div>
+  if (loading) {
+    return <div>Cargando...</div>;
   }
   // El enrutador principal
   return (
     <Routes>
       {/* Ruta Pública: LOGIN */}
       {/* Si ya estoy logueado, no quiero ver el login, llévame al dashboard */}
-      <Route 
-        path="/login" 
-        element={isAuthenticated ? <Navigate to="/dashboard" /> : <LoginPage />} 
+      <Route
+        path="/login"
+        element={isAuthenticated ? <Navigate to="/dashboard" /> : <LoginPage />}
       />
 
-      <Route 
-        path='/alertas'
-        element={<AlertasPage />}
-      />
-
-      <Route 
-      path="/medicamentos" 
-      element={<MedicamentosPage />} />
-  
-      <Route 
+      <Route
         path="/register"
-        element={isAuthenticated ? <Navigate to='/dashboard' /> : <RegisterPage />}
+        element={
+          isAuthenticated ? <Navigate to="/dashboard" /> : <RegisterPage />
+        }
       />
 
       {/* Grupo de Rutas Protegidas */}
@@ -44,8 +38,14 @@ function App() {
         Si el guardia nos deja pasar (isAuthenticated), dibujará el <Outlet />.
         Y dentro de ese <Outlet /> se dibujará la ruta hija que coincida (ej. /dashboard).
       */}
-      <Route element={<RutaProtegida />}> 
+      <Route element={<RutaProtegida />}>
         <Route path="/dashboard" element={<DashboardPage />} />
+
+        <Route path="/alertas" element={<AlertasPage />} />
+
+        <Route path="/medicamentos" element={<MedicamentosPage />} />
+
+        <Route path="/medicamentos/nuevo" element={<NuevoMedicamentoPage />} />
         {/* Futuras rutas protegidas irán aquí: */}
         {/* <Route path="/medicamentos" element={<MedicamentosPage />} /> */}
         {/* <Route path="/alertas" element={<AlertasPage />} /> */}
@@ -56,12 +56,7 @@ function App() {
           que, gracias a la lógica de arriba, será /login o /dashboard. */}
       <Route path="*" element={<Navigate to="/login" />} />
     </Routes>
-  )
+  );
 }
 
-
-export default App
-
-
-
-
+export default App;
