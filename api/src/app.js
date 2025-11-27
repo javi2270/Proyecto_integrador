@@ -1,5 +1,5 @@
 const express = require('express');
-const path = require('path')
+const path = require('path');
 
 // Le decimos a dotenv que busque el archivo .env en la carpeta padre de /src
 require('dotenv').config({ path: path.resolve(__dirname, '../.env') });
@@ -14,19 +14,23 @@ const crearRolesIniciales = async () => {
         const count = await Rol.estimatedDocumentCount();
         if (count > 0) return;
         const values = await Promise.all([
-            new Rol({ nombre: 'Empleado' }).save(), // Corregido para que coincida con las pruebas
+            new Rol({ nombre: 'Empleado' }).save(),
             new Rol({ nombre: 'Administrador' }).save()
         ]);
-        console.log('Valores iniciales creados:', values.map(rol => rol.nombre));
+        console.log('Valores iniciales creados:', values.map(r => r.nombre));
     } catch (error) {
-        console.error('Error al crear los valores iniciales.', error);
-        throw error; // Lanzamos el error para que las pruebas puedan detectarlo si falla
+        console.error('Error al crear roles iniciales.', error);
+        throw error;
     }
 };
 
 const app = express();
 app.use(express.json());
-app.use(routes);
 
-// Exportamos todo para que sea reutilizable
+// ✅ Rutas montadas correctamente en /api
+app.use('/api', routes);
+
+// ❌ YA NO USAR ESTO — lo hacía duplicado y mal
+// app.use('/api/ventas', require('./routes/venta.route'));
+
 module.exports = { app, connectionMongo, crearRolesIniciales, iniciarRevisionVencimientos, iniciarAlertaTemperaturaMensual };

@@ -1,22 +1,12 @@
-const { Router } = require('express')
-const medicamentoRoute = require('./medicamento.route')
-const laboratorioRoute = require('./laboratorio.route')
-const ventaRoute = require('./venta.route')
-const alertaRoute = require('./alerta.route')
-const authRoute = require('./auth.route')
-const temperaturaRoute = require('./temperatura.route')
-const usuarioRoute = require('./usuario.route')
+const { Router } = require('express');
+const router = Router();
 
-const router = Router()
+router.use('/auth', require('./auth.route'));
+router.use('/medicamentos', require('./medicamento.route'));
+router.use('/laboratorios', require('./laboratorio.route'));
+router.use('/ventas', require('./venta.route'));
+router.use('/alerta', require('./alerta.route'));
+router.use('/temperatura', require('./temperatura.route'));
+router.use('/usuarios', require('./usuario.route'));
 
-router.use('/medicamentos', medicamentoRoute)
-router.use('/laboratorios', laboratorioRoute)
-router.use('/ventas', ventaRoute)
-router.use('/alerta', alertaRoute) 
-router.use('/auth', authRoute)
-router.use('/temperatura', temperaturaRoute)
-router.use('/usuarios', usuarioRoute)
-
-
-
-module.exports = router    
+module.exports = router;

@@ -109,4 +109,14 @@ const login = async (req, res) => {
 };
 authController.login = login;
 
+const profile = async (req, res) => {
+  if (!req.usuario) {
+    return res.status(401).json({ message: "No autorizado" });
+  }
+  res.json(req.usuario);
+};
+
+authController.profile = profile;
+
+
 module.exports = authController;

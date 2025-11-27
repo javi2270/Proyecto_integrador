@@ -2,75 +2,82 @@ import React, { useState } from 'react'
 import { useNavigate, Link } from 'react-router-dom'
 import { useAuth } from '../context/AuthContext'
 
-
 const LoginPage = () => {
-  // Es tados para el formulario
-  // usamos useState para "conectar" React con los campos <input>
   const [email, setEmail] = useState('')
   const [password, setPassword ] = useState('')
-  const [error, setError] = useState('') // un estado para mensajes error
-  // Uso los hooks
+  const [mostrarPassword, setMostrarPassword] = useState(false)
+  const [error, setError] = useState('')
+
   const navigate = useNavigate()
   const { login } = useAuth()
 
-  // funcion de envio (por ahora vacia)
   const handleSubmit = async (e) => {
-    e.preventDefault() // evita que la pagina se recargue
-    setError('') // limpio errores previos
-    try {
-      // llamo al login del context
-      await login(email, password)
-      // si 'login' tiene exito redirijo a dashboard
-      navigate('/dashboard')
+    e.preventDefault()
+    setError('')
 
+    try {
+      await login(email, password)
+      navigate('/dashboard')
     } catch (error) {
-      // si login lanza un error (ej: la API dice credenciales invalidas)
-      // lo atrapo aca y le muestro un msje al usuario
       console.error(error)
-      setError('Credenciales invalidas, por favor intente de nuevo.')
+      setError('Credenciales inválidas, por favor intente de nuevo.')
     }
   }
-  // el formulario HTML/JSX
+
   return (
     <div style={{padding:'20px', maxWidth:'400px', margin:'auto'}}>
-      <h2>Iniciar sesion (SGMR)</h2>
+      <h2>Iniciar sesión (SGMR)</h2>
+
       <form onSubmit={handleSubmit}>
-        <div style={{marginBottom:'10px'}}>
+        <div className="mb-3">
           <label>Email:</label>
           <input 
-          type='email'
-          value={email} // el valor del input esta "atado" al estado
-          onChange={(e) => setEmail(e.target.value) } // cuando escribo se actualiza el estado
-          required
-          style={{width:'100%'}}
+            type='email'
+            value={email}
+            onChange={(e) => setEmail(e.target.value)}
+            required
+            className="form-control"
           />
         </div>
 
-        <div style={ {marginBottom:'10px'}}>
+        <div className="mb-3" style={{ position:'relative' }}>
           <label>Contraseña</label>
+
           <input 
-          type="password"
-          value={password}
-          onChange={ e => setPassword(e.target.value)}
-          required
-          style={{width:'100%'}}
+            type={mostrarPassword ? "text" : "password"}
+            value={password}
+            onChange={(e) => setPassword(e.target.value)}
+            required
+            className="form-control"
           />
+
+          <i
+            className={`bi ${mostrarPassword ? "bi-eye-slash" : "bi-eye"}`}
+            onClick={() => setMostrarPassword(!mostrarPassword)}
+            style={{
+              position: "absolute",
+              right: "10px",
+              top: "60%",
+              transform: "translateY(-50%)",
+              cursor: "pointer",
+              fontSize: "1.2rem"
+            }}
+          ></i>
         </div>
 
-        {/*muestro el error si existe */}
-        {error && <p style={{color:'red'}}>{error}</p>}
+        {error && <p className="text-danger">{error}</p>}
 
-        <button type='submit' style={{width:'100%', padding:'10px'}}>
+        <button type='submit' className="btn btn-primary w-100 mt-2">
           Ingresar
         </button>
       </form>
 
-      <p style={ { marginTop: '15px', textAlign: 'center'} }>
-      ¿ No tienes cuenta ?
-      <Link to='/register'>  Registrate aqui</Link>
+      <p className="text-center mt-3">
+        ¿No tienes cuenta?
+        <Link to='/register'> Regístrate aquí</Link>
       </p>
     </div>
   )
 } 
 
-export default LoginPage  
+export default LoginPage

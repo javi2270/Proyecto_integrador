@@ -1,79 +1,71 @@
-// client/src/context/AuthContext.jsx
-
-import React, { createContext, useState, useContext, useEffect } from 'react';
-import { loginService, logoutService } from '../services/auth.service';
+import { createContext, useContext, useState, useEffect } from "react";
+import api from "../api/axios";
 
 const AuthContext = createContext();
 
+export const AuthProvider = ({ children }) => {
+  const [usuario, setUsuario] = useState(null);
+  const [loading, setLoading] = useState(true);
 
-// eslint-disable-next-line react-refresh/only-export-components
-export const useAuth = () => {
-  const context = useContext(AuthContext);
-  if (!context) {
-    throw new Error("useAuth debe usarse dentro de un AuthProvider");
-  }
-  return context;
+  const isAuthenticated = !!usuario;
+
+  const isAdmin = usuario?.rol?.nombre === "Administrador";
+  const isEmpleado = usuario?.rol?.nombre === "Empleado";
+
+  // 🔐 LOGIN
+  const login = async (email, password) => {
+    const res = await api.post("/auth/login", { email, password });
+
+    setUsuario(res.data.usuario);
+
+    // Guardar token
+    localStorage.setItem("token", res.data.token);
+  };
+
+  // 🔓 LOGOUT
+  const logout = () => {
+    setUsuario(null);
+    localStorage.removeItem("token");
+  };
+
+  // 🔁 Verificar sesión al cargar la app
+  useEffect(() => {
+    const verificarSesion = async () => {
+      const token = localStorage.getItem("token");
+      if (!token) {
+        setLoading(false);
+        return;
+      }
+
+      try {
+        const res = await api.get("/auth/profile"); 
+        setUsuario(res.data);
+      } catch (err) {
+        setUsuario(null);
+        localStorage.removeItem("token");
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    verificarSesion();
+  }, []);
+
+  return (
+    <AuthContext.Provider
+      value={{
+        usuario,
+        isAuthenticated,
+        loading,
+        login,
+        logout,
+        isAdmin,
+        isEmpleado,
+      }}
+    >
+      {children}
+    </AuthContext.Provider>
+  );
 };
 
-export const AuthProvider = ({ children }) => {
-    
-    // Estados
-    const [usuario, setUsuario] = useState(null);
-    const [token, setToken] = useState(null);
-    const [isAuthenticated, setIsAuthenticated] = useState(false);
-    const [loading, setLoading] = useState(true);
-
-    // Efecto
-    useEffect( () => {
-        const storedToken = localStorage.getItem('token');
-        const storedUser = localStorage.getItem('usuario');
-
-        if (storedToken && storedUser) {
-            setToken(storedToken);
-            setUsuario(JSON.parse(storedUser));
-            setIsAuthenticated(true);
-        }
-        setLoading(false);
-    }, []);
-
-    // Login
-    const login = async (email, password) => {
-        try {
-            const data = await loginService(email, password);
-            setUsuario(data.usuario);
-            setToken(data.token);
-            setIsAuthenticated(true); 
-            localStorage.setItem('token', data.token);
-            localStorage.setItem('usuario', JSON.stringify(data.usuario));
-
-        } catch (error) {
-            setUsuario(null);
-            setToken(null);
-            setIsAuthenticated(false);
-            throw error;
-        }
-    };
-
-    // Logout
-    const logout = () => {
-        logoutService(); 
-        setUsuario(null);
-        setToken(null);
-        setIsAuthenticated(false); 
-        localStorage.removeItem('token');
-        localStorage.removeItem('usuario');
-    };
-
-    return (
-        <AuthContext.Provider value={{
-            usuario,
-            token,
-            isAuthenticated, 
-            loading,
-            login,
-            logout
-        }}>
-            {children}
-        </AuthContext.Provider>
-    );
-}
+export const useAuth = () => useContext(AuthContext);

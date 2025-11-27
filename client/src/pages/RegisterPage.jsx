@@ -1,83 +1,94 @@
 import React, { useState } from "react";
 import { useNavigate, Link } from "react-router-dom";
 import { useAuth } from "../context/AuthContext";
-import { registerService  } from "../services/auth.service";  
+import { registerService } from "../services/auth.service";
 
 const RegisterPage = () => {
-  // estados para los campos del formulario
   const [nombre, setNombre] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [mostrarPassword, setMostrarPassword] = useState(false);
   const [error, setError] = useState("");
 
-  // Hooks
-
   const navigate = useNavigate();
-  const { login } = useAuth(); // usare login del context
+  const { login } = useAuth();
 
   const handleSubmit = async (e) => {
     e.preventDefault();
     setError("");
 
     try {
-      // llamo al *servicio* de registro
       await registerService(nombre, email, password);
-      // uso la funcion "login" de Context para setear manualmente la sesion
-      await login(email, password); // Esto loguea al usuario con los datos acabo de crear
-
-      // redirijo al dashboard
+      await login(email, password);
       navigate("/dashboard");
     } catch (error) {
-      // error.response.data .message viene de la API
       setError(
         error.response?.data?.message || "Error al registrar, intente de nuevo"
       );
     }
   };
+
   return (
     <div style={{ padding: "20px", maxWidth: "400px", margin: "auto" }}>
       <h2>Crear cuenta</h2>
+
       <form onSubmit={handleSubmit}>
-        <div style={{ marginBottom: "10px" }}>
+        <div className="mb-3">
           <label>Nombre</label>
           <input
             type="text"
             value={nombre}
             onChange={(e) => setNombre(e.target.value)}
             required
-            style={{ width: "100%" }}
+            className="form-control"
           />
-        
         </div>
-        <div style={{ marginBottom: "10px" }}>
+
+        <div className="mb-3">
           <label>Email</label>
           <input
             type="email"
             value={email}
             onChange={(e) => setEmail(e.target.value)}
             required
-            style={{ width: "100%" }}
+            className="form-control"
           />
         </div>
-        <div style={{ marginBottom: "10px" }}>
+
+        <div className="mb-3" style={{ position: "relative" }}>
           <label>Contraseña:</label>
           <input
-            type="password"
+            type={mostrarPassword ? "text" : "password"}
             value={password}
             onChange={(e) => setPassword(e.target.value)}
             required
-            style={{ width: "100%" }}
+            className="form-control"
           />
+
+          <i
+            className={`bi ${mostrarPassword ? "bi-eye-slash" : "bi-eye"}`}
+            onClick={() => setMostrarPassword(!mostrarPassword)}
+            style={{
+              position: "absolute",
+              right: "10px",
+              top: "60%",
+              transform: "translateY(-50%)",
+              cursor: "pointer",
+              fontSize: "1.2rem"
+            }}
+          ></i>
         </div>
 
-        {error && <p style={{ color: "red" }}>{error}</p>}
+        {error && <p className="text-danger">{error}</p>}
 
-        <button type="submit" style={{ width: "100%", padding: "10px" }}>
+        <button type="submit" className="btn btn-success w-100 mt-2">
           Registrarse
         </button>
       </form>
-      <p style={{ marginTop: "15px", textAlign: "center" }}>
-        ¿ Ya tienes cuenta ?<Link to="/login">  Inicia sesion aqui</Link>
+
+      <p className="text-center mt-3">
+        ¿Ya tienes cuenta?
+        <Link to="/login"> Inicia sesión aquí</Link>
       </p>
     </div>
   );

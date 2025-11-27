@@ -1,5 +1,7 @@
+// client/src/App.jsx
 import { Route, Routes, Navigate } from "react-router-dom";
 import { useAuth } from "./context/AuthContext";
+
 import LoginPage from "./pages/LoginPage";
 import DashboardPage from "./pages/DashboardPage";
 import RutaProtegida from "./components/RutaProtegida";
@@ -7,19 +9,15 @@ import RegisterPage from "./pages/RegisterPage";
 import AlertasPage from "./pages/AlertasPage";
 import MedicamentosPage from "./pages/MedicamentosPage";
 import NuevoMedicamentoPage from "./pages/NuevoMedicamentoPage";
+import VentasPage from "./pages/VentasPage";
 
 function App() {
-  // Leo el estado de autenticacion desde Context
-  const { isAuthenticated, loading } = useAuth();
-  // Manejo de carga ( evita que la app parpadee y muestre el loading por 0.1seg)
-  if (loading) {
-    return <div>Cargando...</div>;
-  }
-  // El enrutador principal
+  const { isAuthenticated, loading, isAdmin } = useAuth();
+
+  if (loading) return <div>Cargando...</div>;
+
   return (
     <Routes>
-      {/* Ruta Pública: LOGIN */}
-      {/* Si ya estoy logueado, no quiero ver el login, llévame al dashboard */}
       <Route
         path="/login"
         element={isAuthenticated ? <Navigate to="/dashboard" /> : <LoginPage />}
@@ -32,28 +30,29 @@ function App() {
         }
       />
 
-      {/* Grupo de Rutas Protegidas */}
-      {/* Este <Route> "envuelve" a las demás. 
-        Primero se "dibuja" <RutaProtegida>.
-        Si el guardia nos deja pasar (isAuthenticated), dibujará el <Outlet />.
-        Y dentro de ese <Outlet /> se dibujará la ruta hija que coincida (ej. /dashboard).
-      */}
+      {/* Rutas protegidas */}
       <Route element={<RutaProtegida />}>
         <Route path="/dashboard" element={<DashboardPage />} />
 
+        {/* SOLO ADMIN */}
+        <Route
+          path="/medicamentos"
+          element={
+            isAdmin ? <MedicamentosPage /> : <Navigate to="/dashboard" />
+          }
+        />
+        <Route
+          path="/medicamentos/nuevo"
+          element={
+            isAdmin ? <NuevoMedicamentoPage /> : <Navigate to="/dashboard" />
+          }
+        />
+
+        {/* ADMIN + EMPLEADO */}
+        <Route path="/ventas" element={<VentasPage />} />
         <Route path="/alertas" element={<AlertasPage />} />
-
-        <Route path="/medicamentos" element={<MedicamentosPage />} />
-
-        <Route path="/medicamentos/nuevo" element={<NuevoMedicamentoPage />} />
-        {/* Futuras rutas protegidas irán aquí: */}
-        {/* <Route path="/medicamentos" element={<MedicamentosPage />} /> */}
-        {/* <Route path="/alertas" element={<AlertasPage />} /> */}
       </Route>
 
-      {/* Redirección por defecto */}
-      {/* Si entro a cualquier URL, me redirige a la ruta principal
-          que, gracias a la lógica de arriba, será /login o /dashboard. */}
       <Route path="*" element={<Navigate to="/login" />} />
     </Routes>
   );

@@ -1,15 +1,16 @@
-const express = require('express')
-const ventaController = require('../controllers/venta.controller')
+const express = require('express');
+const router = express.Router();
 
-const router = express.Router()
+const ventaController = require('../controllers/venta.controller');
+const { validarToken } = require('../middlewares/auth.validator');
 
-// Registrar una venta
-router.post('/', ventaController.addVenta)
+// Registrar una venta (requiere login)
+router.post('/', validarToken, ventaController.addVenta);
 
-// Obtener todas las ventas
-router.get('/', ventaController.getAllVentas)
+// Obtener todas las ventas (requiere login)
+router.get('/', validarToken, ventaController.getAllVentas);
 
-// Obtener ventas por medicamento (buscar por código o nombre)
-router.get('/:identificador', ventaController.getVentasByMedicamento)
+// Obtener ventas por medicamento
+router.get('/:identificador', validarToken, ventaController.getVentasByMedicamento);
 
-module.exports = router
+module.exports = router;
