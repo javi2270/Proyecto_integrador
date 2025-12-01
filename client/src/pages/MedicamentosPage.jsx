@@ -11,12 +11,12 @@ import {
 import {
   getMedicamentos,
   deleteMedicamento,
-  addStock, // <--- IMPORTANTE
+  addStock,
 } from "../services/medicamento.service";
 import { useAuth } from "../context/AuthContext";
 import { useNavigate } from "react-router-dom";
 
-// IMPORTAMOS EL MODAL (Si no pones esto, falla)
+// IMPORTAMOS EL MODAL
 import IngresoStockModal from "../components/IngresoStockModal";
 
 const MedicamentosPage = () => {
@@ -25,7 +25,7 @@ const MedicamentosPage = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
 
-  // --- AQUÍ FALTABAN ESTAS LÍNEAS (Los Hooks) ---
+  // --- (Los Hooks) ---
   const [showModal, setShowModal] = useState(false);      // Controla si se ve la ventana
   const [selectedMed, setSelectedMed] = useState(null);   // Controla qué medicamento se edita
   // -----------------------------------------------
@@ -109,7 +109,7 @@ const MedicamentosPage = () => {
             variant="success"
             onClick={() => navigate("/medicamentos/nuevo")}
           >
-            + Nuevo Medicamento
+            + Registrar medicamento
           </Button>
         )}
       </div>
@@ -177,8 +177,6 @@ const MedicamentosPage = () => {
         </Table>
       )}
 
-      {/* --- ESTO FALTABA: EL COMPONENTE MODAL EN EL RETURN --- */}
-      {/* Si no pones esto aquí, React no sabe dónde dibujar la ventana */}
       <IngresoStockModal 
         show={showModal} 
         handleClose={() => setShowModal(false)}

@@ -62,7 +62,7 @@ const NuevoMedicamentoPage = () => {
     }
 
     try {
-      // CONVERSIÓN IMPORTANTE: Aseguramos que stock sean números
+      // Aseguramos que stock sean números
       const datosAEnviar = {
           ...formData,
           stock: parseInt(formData.stock),
@@ -82,9 +82,8 @@ const NuevoMedicamentoPage = () => {
         setError(err.response?.data?.message || "Error al crear el medicamento");
       }
     }
-  }; // <--- AQUÍ termina handleSubmit
-
-  // --- AQUÍ EMPIEZA EL DIBUJADO (RETURN) ---
+  }; 
+  
   return (
     <Container className="mt-4 mb-5">
       <Card className="shadow-sm p-3" style={{ maxWidth: "600px", margin: "0 auto" }}>
