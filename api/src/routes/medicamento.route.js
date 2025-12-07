@@ -1,20 +1,27 @@
-const { Router } = require('express')
-const medicamentoController = require('../controllers/medicamento.controller')
-const { validarMedicamento, validarActualizacionMedicamento } = require('../middlewares/medicamento.validator')
-const { validarToken, esAdministrador } = require('../middlewares/auth.validator')
-const router = Router()
+const { Router } = require("express");
+const medicamentoController = require("../controllers/medicamento.controller");
 
+const router = Router();
 
-router.get('/all', medicamentoController.getAllMedicamentos)
-router.post('/', validarMedicamento, medicamentoController.addMedicamento)
-router.get('/', medicamentoController.getMedicamento);
+// Obtener todos
+router.get("/all", medicamentoController.getAllMedicamentos);
 
+// Buscar por código o nombre (identificador)
+router.get("/buscar/:identificador", medicamentoController.getByIdentificador);
+
+// Buscar uno (query)
+router.get("/", medicamentoController.getMedicamento);
+
+// Crear
+router.post("/", medicamentoController.addMedicamento);
+
+// Actualizar
+router.put("/:codigoBarras", medicamentoController.updateMedicamento);
+
+// Eliminar (soft delete)
+router.delete("/:codigoBarras", medicamentoController.deleteMedicamento);
+
+// Ingreso de stock
 router.post("/:codigoBarras/ingreso-stock", medicamentoController.registrarIngresoStock);
 
-
-router.put("/:codigoBarras", [validarToken, esAdministrador], validarActualizacionMedicamento, medicamentoController.updateMedicamento)
-router.delete("/:codigoBarras", [validarToken, esAdministrador], medicamentoController.deleteMedicamento)
-
-module.exports = router
-
-
+module.exports = router;

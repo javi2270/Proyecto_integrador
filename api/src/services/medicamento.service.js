@@ -1,103 +1,106 @@
-const Medicamento = require("../models/medicamento.model");
+const { Medicamento } = require("../models/index");
 
-// Obtener todos los medicamentos activos
 const getAll = async () => {
-  return await Medicamento.find({ activo: true }).populate(
-    "laboratorio",
-    "nombre"
-  );
+  return await Medicamento.find({ activo: true })
+    .populate("laboratorio", "nombre")
+    .lean();
 };
 
-// Crear o Reactivar un medicamento
-const createMedicamento = async (data) => {
-  const { codigoBarras } = data;
-
-  // 1. Buscar si ya existe (incluso si está inactivo)
-  const medicamentoExistente = await Medicamento.findOne({ codigoBarras });
-
-  if (medicamentoExistente) {
-    // Si existe y está activo -> Error
-    if (medicamentoExistente.activo) {
-      throw new Error("DUPLICADO_ACTIVO"); 
-    }
-
-    // Si existe y NO está activo -> Reactivar
-    const reactivado = await Medicamento.findOneAndUpdate(
-      { codigoBarras },
-      { ...data, activo: true },
-      { new: true, runValidators: true }
-    );
-    return { tipo: "REACTIVADO", medicamento: reactivado };
-  }
-
-  // 2. Si no existe -> Crear nuevo
-  const nuevo = await Medicamento.create(data);
-  return { tipo: "CREADO", medicamento: nuevo };
+const getByCodigoBarras = async (codigo) => {
+  return await Medicamento.findOne({ codigoBarras: codigo, activo: true })
+    .populate("laboratorio", "nombre");
 };
 
-// Buscar por código (CORREGIDO: activo va dentro del filtro)
-const getByCodigoBarras = async (codigoBarras) => {
-  // Antes tenías: findOne({codigo}, {activo:true}) <- Eso es proyección incorrecta
-  // Correcto: Buscar donde codigo coincida Y activo sea true
-  return await Medicamento.findOne({ codigoBarras, activo: true }).populate("laboratorio", "nombre");
-};
-
-// Buscar por nombre (CORREGIDO)
 const getByNombre = async (nombre) => {
-  return await Medicamento.find(
-    { 
-      nombre: { $regex: nombre, $options: "i" }, 
-      activo: true // Filtramos solo activos
-    }
-  ).populate("laboratorio", "nombre");
+  return await Medicamento.findOne({ nombre, activo: true })
+    .populate("laboratorio", "nombre");
 };
 
-// Helper para buscar por cualquiera de los dos
+// requerido por ventas
 const getByIdentificador = async (identificador) => {
-  let medicamento = await getByCodigoBarras(identificador);
-  // Si no es un código de barras (o no se encontró), probamos por nombre
-  if (!medicamento) {
-    // Ojo: getByNombre devuelve un array (find), aquí tomamos el primero si existe
-    const resultados = await getByNombre(identificador);
-    medicamento = resultados[0]; 
+  return await Medicamento.findOne({
+    activo: true,
+    $or: [
+      { codigoBarras: identificador },
+      { nombre: identificador }
+    ]
+  }).populate("laboratorio", "nombre");
+};
+
+const create = async (data) => {
+  const existente = await Medicamento.findOne({
+    codigoBarras: data.codigoBarras,
+  });
+
+  if (existente && existente.activo) {
+    const err = new Error("DUPLICADO_ACTIVO");
+    throw err;
   }
-  return medicamento;
+
+  if (existente && !existente.activo) {
+    existente.nombre = data.nombre;
+    existente.lote = data.lote;
+    existente.fechaVencimiento = data.fechaVencimiento;
+    existente.stock = data.stock;
+    existente.stockMinimo = data.stockMinimo;
+    existente.laboratorio = data.laboratorio;
+    existente.activo = true;
+
+    await existente.save();
+
+    return {
+      tipo: "REACTIVADO",
+      medicamento: existente,
+    };
+  }
+
+  const nuevo = new Medicamento(data);
+  await nuevo.save();
+
+  return {
+    tipo: "CREADO",
+    medicamento: nuevo,
+  };
 };
 
-// Actualizar (CORREGIDO: Estructura de argumentos)
-const update = async (codigoBarras, data) => {
+const update = async (codigo, data) => {
   return await Medicamento.findOneAndUpdate(
-    { codigoBarras, activo: true }, // 1. Query (filtro)
-    data,                           // 2. Update (datos nuevos)
-    { new: true, runValidators: true } // 3. Options
-  );
+    { codigoBarras: codigo, activo: true },
+    data,
+    { new: true }
+  )
+    .populate("laboratorio", "nombre")
+    .lean();
 };
 
-// Eliminar (Soft Delete)
-const remove = async (codigoBarras) => {
+const remove = async (codigo) => {
   return await Medicamento.findOneAndUpdate(
-    { codigoBarras, activo: true },
+    { codigoBarras: codigo, activo: true },
     { activo: false },
     { new: true }
   );
 };
 
-// Añadir stock (CORREGIDO: Estructura de argumentos)
 const addStock = async (codigoBarras, cantidad) => {
-  return await Medicamento.findOneAndUpdate(
-    { codigoBarras, activo: true }, // 1. Query: Combinamos codigo y activo
-    { $inc: { stock: cantidad } },  // 2. Update
-    { new: true, runValidators: true } // 3. Options
-  );
+  const med = await Medicamento.findOne({
+    codigoBarras,
+    activo: true,
+  });
+
+  if (!med) return null;
+
+  med.stock += cantidad;
+  await med.save();
+
+  return med;
 };
 
-// EXPORTACIÓN CORREGIDA
 module.exports = {
   getAll,
-  create: createMedicamento, // <--- AQUÍ ESTABA EL ERROR DE REFERENCIA
+  create,
   getByCodigoBarras,
   getByNombre,
-  getByIdentificador,
+  getByIdentificador, 
   update,
   remove,
   addStock,

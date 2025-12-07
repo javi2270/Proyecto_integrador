@@ -2,10 +2,13 @@ const { Router } = require('express');
 const alertaController = require('../controllers/alerta.controller');
 const router = Router();
 
-// Ruta para obtener todas las alertas activas (no leídas)
+// Obtener alertas activas
 router.get('/', alertaController.getAlertasActivas);
 
-// Ruta para marcar una alerta específica como leída
+// Marcar una alerta
 router.patch('/:id/leida', alertaController.marcarComoLeida);
 
-module.exports = router
+// Marcar todas las alertas de un tipo
+//router.patch('/tipo/:tipo/leidas', alertaController.marcarPorTipo);
+
+module.exports = router;

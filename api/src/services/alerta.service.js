@@ -29,26 +29,29 @@ const crearAlertaSiNoExiste = async (datosAlerta) => {
     throw error;
   }
 };
+alertaService.crearAlertaSiNoExiste = crearAlertaSiNoExiste;
+
 // Obtener todas las alertas activas
 const getAlertasActivas = async () => {
   return await Alerta.find({ leida: false })
     .populate("medicamento", "nombre codigoBarras stock stockMinimo")
     .sort({ createdAt: -1 });
 };
+alertaService.getAlertasActivas = getAlertasActivas;
 
 // Marcar una alerta como leída
 const marcarComoLeida = async (id) => {
   return await Alerta.findByIdAndUpdate(id, { leida: true }, { new: true });
 };
-
-// Marcar todas las de un tipo como leídas (para HU-10 temperatura)
-const marcarComoLeidaPorTipo = async (tipo) => {
-  return await Alerta.updateMany({ tipo, leida: false }, { leida: true });
-};
-
-alertaService.crearAlertaSiNoExiste = crearAlertaSiNoExiste;
-alertaService.getAlertasActivas = getAlertasActivas;
 alertaService.marcarComoLeida = marcarComoLeida;
-alertaService.marcarComoLeidaPorTipo = marcarComoLeidaPorTipo;
+
+// Marcar todas las de un tipo como leídas
+//const marcarPorTipo = async (tipo) => {
+//    return await Alerta.updateMany(
+//        { tipo, leida: false },
+//        { leida: true }
+//    );
+//};
+//alertaService.marcarPorTipo = marcarPorTipo;
 
 module.exports = alertaService;

@@ -45,25 +45,6 @@ const getLaboratorioByName = async (req, res) => {
 }
 laboratorioController.getLaboratorioByName = getLaboratorioByName
 
-// Actualizar laboratorio por NOMBRE
-const updateLaboratorio = async (req, res) => {
-    const { direccion, telefono } = req.body
-    try {
-        const laboratorio = await Laboratorio.findOneAndUpdate(
-            { nombre: req.params.nombre },
-            { direccion, telefono },
-            { new: true, runValidators: true }
-        )
-        if (!laboratorio) {
-            return res.status(404).json({ message: "Laboratorio no encontrado" })
-        }
-        res.status(200).json(laboratorio)
-    } catch (error) {
-        res.status(400).json({ message: error.message })
-    }
-}
-laboratorioController.updateLaboratorio = updateLaboratorio
-
 // Eliminar laboratorio por NOMBRE
 const deleteLaboratorio = async (req, res) => {
     try {

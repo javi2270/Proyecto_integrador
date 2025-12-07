@@ -1,5 +1,3 @@
-// api/src/index.js
-
 const { app, connectionMongo, crearRolesIniciales, iniciarRevisionVencimientos, iniciarAlertaTemperaturaMensual } = require('./app');
 
 const PORT = process.env.PORT ?? 3000;
