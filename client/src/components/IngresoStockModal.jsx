@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { Modal, Form, Button, Alert } from "react-bootstrap";
+import { Modal, Button, Form, Alert } from "react-bootstrap";
 
 const IngresoStockModal = ({ show, handleClose, medicamento, onGuardar }) => {
   const [cantidad, setCantidad] = useState("");
@@ -7,27 +7,25 @@ const IngresoStockModal = ({ show, handleClose, medicamento, onGuardar }) => {
 
   const handleSubmit = () => {
     if (!cantidad || cantidad <= 0) {
-      setError("POr favor ingresa una cantidad valida.");
+      setError("Por favor ingresa una cantidad válida.");
       return;
     }
-    // envio el dato al padre
-    onGuardar(medicamento.codigoBarras, cantidad);
 
-    // limpio
+    onGuardar(medicamento.codigoBarras, Number(cantidad));
+
     setCantidad("");
     setError("");
     handleClose();
   };
 
-  if (!medicamento) {
-    return null;
-  }
+  if (!medicamento) return null;
 
   return (
     <Modal show={show} onHide={handleClose} centered>
       <Modal.Header closeButton>
         <Modal.Title>Ingreso de Mercadería</Modal.Title>
       </Modal.Header>
+
       <Modal.Body>
         <p>
           Estás agregando stock para: <strong>{medicamento.nombre}</strong>
@@ -48,6 +46,7 @@ const IngresoStockModal = ({ show, handleClose, medicamento, onGuardar }) => {
           />
         </Form.Group>
       </Modal.Body>
+
       <Modal.Footer>
         <Button variant="secondary" onClick={handleClose}>
           Cancelar

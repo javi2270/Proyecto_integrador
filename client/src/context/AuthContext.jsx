@@ -1,5 +1,5 @@
 import { createContext, useContext, useState, useEffect } from "react";
-import api from "../api/axios";
+import api from "../services/api";
 
 const AuthContext = createContext();
 
@@ -8,47 +8,51 @@ export const AuthProvider = ({ children }) => {
   const [loading, setLoading] = useState(true);
 
   const isAuthenticated = !!usuario;
-
   const isAdmin = usuario?.rol?.nombre === "Administrador";
   const isEmpleado = usuario?.rol?.nombre === "Empleado";
 
-  // 🔐 LOGIN
+  // LOGIN
   const login = async (email, password) => {
+    setLoading(true);
+
     const res = await api.post("/auth/login", { email, password });
-
-    setUsuario(res.data.usuario);
-
-    // Guardar token
     localStorage.setItem("token", res.data.token);
+
+    // 🔥 Obtenemos el usuario desde /profile para consistencia
+    const perfil = await api.get("/auth/profile");
+    setUsuario(perfil.data);
+
+    setLoading(false);
   };
 
-  // 🔓 LOGOUT
+  // LOGOUT
   const logout = () => {
-    setUsuario(null);
     localStorage.removeItem("token");
+    setUsuario(null);
   };
 
-  // 🔁 Verificar sesión al cargar la app
+  // Verificación automática
   useEffect(() => {
-    const verificarSesion = async () => {
+    const verificar = async () => {
       const token = localStorage.getItem("token");
+
       if (!token) {
         setLoading(false);
         return;
       }
 
       try {
-        const res = await api.get("/auth/profile"); 
+        const res = await api.get("/auth/profile");
         setUsuario(res.data);
       } catch (err) {
-        setUsuario(null);
         localStorage.removeItem("token");
+        setUsuario(null);
       } finally {
         setLoading(false);
       }
     };
 
-    verificarSesion();
+    verificar();
   }, []);
 
   return (

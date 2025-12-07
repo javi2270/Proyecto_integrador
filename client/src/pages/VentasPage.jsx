@@ -1,205 +1,167 @@
-import React, { useState, useEffect } from "react";
+import React, { useEffect, useState } from "react";
 import {
   Container,
+  Table,
+  Button,
+  Form,
   Row,
   Col,
-  Form,
-  Button,
-  Table,
   Alert,
-  Spinner,
 } from "react-bootstrap";
 
-import { getMedicamentos } from "../services/medicamento.service";
-import { crearVenta, getVentas } from "../services/venta.service";
+import { getAllMedicamentos } from "../services/medicamento.service";
+import { 
+  getVentas, 
+  registrarVenta, 
+  getVentasByMedicamento,
+} from "../services/venta.service";
 
 const VentasPage = () => {
-  // estados para IU
-  const [medicamentos, setMedicamentos] = useState([]);
   const [ventas, setVentas] = useState([]);
-  const [loading, setLoading] = useState(true);
+  const [medicamentos, setMedicamentos] = useState([]);
+
+  const [identificador, setIdentificador] = useState("");
+  const [cantidad, setCantidad] = useState("");
+  const [motivo, setMotivo] = useState("");
+
   const [error, setError] = useState("");
+  const [msg, setMsg] = useState("");
 
-  // estado del formulario
-  const [form, setForm] = useState({
-    medicamentoCodigo: "",
-    cantidad: 1,
-    motivo: "",
-  });
+  const cargarDatos = async () => {
+    try {
+      const v = await getVentas();
+      const m = await getAllMedicamentos();
+      setVentas(v);
+      setMedicamentos(m);
+    } catch {
+      setError("No se pudieron cargar las ventas.");
+    }
+  };
 
-  // estado para mensajes
-  const [successMsg, setSuccessMsg] = useState("");
-
-  // cargar medicamentos + ventas al iniciar
   useEffect(() => {
-    cargarInicial();
+    cargarDatos();
   }, []);
 
-  const cargarInicial = async () => {
-    try {
-      setLoading(true);
-      const meds = await getMedicamentos();
-      setMedicamentos(meds);
-
-      const ventasResp = await getVentas();
-      setVentas(ventasResp);
-    } catch (err) {
-      console.error(err);
-      setError("Error al cargar datos.");
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  // manejo de campos del formulario — AQUÍ ESTABA TU ERROR
-  const handleChange = (e) => {
-    const { name, value } = e.target; // ← CORRECTO
-    setForm((prev) => ({ ...prev, [name]: value }));
-  };
-
-  const validarFormulario = () => {
-    if (!form.medicamentoCodigo) {
-      setError("Seleccioná un medicamento.");
-      return false;
-    }
-    return true;
-  };
-
-  const handleSubmit = async (e) => {
-    e.preventDefault();
+  const handleRegistrar = async () => {
     setError("");
-    setSuccessMsg("");
+    setMsg("");
 
-    if (!validarFormulario()) return;
+    if (!identificador || !cantidad || !motivo.trim()) {
+      setError("Debe seleccionar medicamento, cantidad y motivo.");
+      return;
+    }
 
     try {
-      await crearVenta({
-        identificador: form.medicamentoCodigo, // backend usa este campo
-        cantidad: Number(form.cantidad),
-        motivo: form.motivo || "Venta",
+      await registrarVenta({
+        identificador,
+        cantidad: Number(cantidad),
+        motivo,
       });
 
-      setSuccessMsg("Venta registrada correctamente.");
-      setForm({ medicamentoCodigo: "", cantidad: 1, motivo: "" });
+      setMsg("Venta registrada correctamente.");
+      setCantidad("");
+      setIdentificador("");
+      setMotivo("");
 
-      await cargarInicial(); // recargar stock y ventas
+      cargarDatos();
     } catch (err) {
-      console.error(err);
-      const msg = err.response?.data?.message || "Error al registrar la venta.";
-      setError(msg);
+      setError(err.response?.data?.message || "No se pudo registrar la venta.");
     }
   };
 
-  if (loading) {
-    return (
-      <Container className="mt-5 text-center">
-        <Spinner animation="border" />
-      </Container>
-    );
-  }
+  const buscarPorMedicamento = async () => {
+    setError("");
+
+    if (!identificador) return;
+
+    try {
+      const data = await getVentasByMedicamento(identificador);
+      setVentas(data);
+    } catch {
+      setError("No se encontraron ventas.");
+    }
+  };
 
   return (
     <Container className="mt-4">
-      <h2>Registrar Venta</h2>
+      <h2>Ventas</h2>
 
-      {error && (
-        <Alert variant="danger" onClose={() => setError("")} dismissible>
-          {error}
-        </Alert>
-      )}
-
-      {successMsg && (
-        <Alert variant="success" onClose={() => setSuccessMsg("")} dismissible>
-          {successMsg}
-        </Alert>
-      )}
+      {msg && <Alert variant="success">{msg}</Alert>}
+      {error && <Alert variant="danger">{error}</Alert>}
 
       <Row className="mb-4">
-        <Col md={6}>
-          <Form onSubmit={handleSubmit}>
-            <Form.Group className="mb-2">
-              <Form.Label>Medicamento</Form.Label>
-              <Form.Select
-                name="medicamentoCodigo"
-                value={form.medicamentoCodigo}
-                onChange={handleChange}
-              >
-                <option value="">-- Seleccioná --</option>
-                {medicamentos.map((m) => (
-                  <option key={m._id} value={m.codigoBarras}>
-                    {m.nombre} — stock: {m.stock}
-                  </option>
-                ))}
-              </Form.Select>
-            </Form.Group>
-
-            <Form.Group className="mb-2">
-              <Form.Label>Cantidad</Form.Label>
-              <Form.Control
-                type="number"
-                name="cantidad"
-                min="1"
-                value={form.cantidad}
-                onChange={handleChange}
-              />
-            </Form.Group>
-
-            <Form.Group className="mb-2">
-              <Form.Label>Motivo (opcional)</Form.Label>
-              <Form.Control
-                type="text"
-                name="motivo"
-                placeholder="Ej: Venta mostrador"
-                value={form.motivo}
-                onChange={handleChange}
-              />
-            </Form.Group>
-
-            <Button variant="success" type="submit">
-              Registrar Venta
-            </Button>
-          </Form>
+        {/* Selector medicamento */}
+        <Col md={3}>
+          <Form.Select
+            value={identificador}
+            onChange={(e) => setIdentificador(e.target.value)}
+          >
+            <option value="">Seleccionar medicamento</option>
+            {medicamentos.map((m) => (
+              <option key={m._id} value={m.codigoBarras}>
+                {m.nombre} ({m.codigoBarras})
+              </option>
+            ))}
+          </Form.Select>
         </Col>
 
-        <Col md={6}>
-          <h5>Últimas ventas</h5>
-          <small className="text-muted">
-            Las más recientes aparecen primero
-          </small>
+        {/* Cantidad */}
+        <Col md={2}>
+          <Form.Control
+            type="number"
+            placeholder="Cantidad"
+            value={cantidad}
+            min="1"
+            onChange={(e) => setCantidad(e.target.value)}
+          />
+        </Col>
 
-          <Table striped bordered hover size="sm" className="mt-2">
-            <thead>
-              <tr>
-                <th>Fecha</th>
-                <th>Medicamento</th>
-                <th>Código</th>
-                <th>Cantidad</th>
-                <th>Usuario</th>
-              </tr>
-            </thead>
+        {/* Motivo */}
+        <Col md={3}>
+          <Form.Control
+            placeholder="Motivo"
+            value={motivo}
+            onChange={(e) => setMotivo(e.target.value)}
+          />
+        </Col>
 
-            <tbody>
-              {ventas.length === 0 ? (
-                <tr>
-                  <td colSpan="5" className="text-center">
-                    No hay ventas registradas.
-                  </td>
-                </tr>
-              ) : (
-                ventas.map((v) => (
-                  <tr key={v._id}>
-                    <td>{new Date(v.fecha || v.createdAt).toLocaleString()}</td>
-                    <td>{v.medicamento?.nombre || "—"}</td>
-                    <td>{v.medicamento?.codigoBarras || "—"}</td>
-                    <td>{v.cantidad}</td>
-                    <td>{v.usuario?.email || "—"}</td>
-                  </tr>
-                ))
-              )}
-            </tbody>
-          </Table>
+        {/* Botón registrar */}
+        <Col md={2}>
+          <Button onClick={handleRegistrar}>Registrar Venta</Button>
+        </Col>
+
+        {/* Buscar */}
+        <Col md={2}>
+          <Button variant="secondary" onClick={buscarPorMedicamento}>
+            Buscar Ventas
+          </Button>
         </Col>
       </Row>
+
+      {/* Tabla */}
+      <Table bordered hover>
+        <thead>
+          <tr>
+            <th>Medicamento</th>
+            <th>Código</th>
+            <th>Cantidad</th>
+            <th>Fecha</th>
+            <th>Vendido por</th>
+          </tr>
+        </thead>
+
+        <tbody>
+          {ventas.map((v) => (
+            <tr key={v._id}>
+              <td>{v.medicamento?.nombre}</td>
+              <td>{v.medicamento?.codigoBarras}</td>
+              <td>{v.cantidad}</td>
+              <td>{new Date(v.fecha).toLocaleString()}</td>
+              <td>{v.usuario?.nombre}</td>
+            </tr>
+          ))}
+        </tbody>
+      </Table>
     </Container>
   );
 };

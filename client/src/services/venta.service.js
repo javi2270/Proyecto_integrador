@@ -1,27 +1,23 @@
-import api from '../api/axios'
+import api from "./api";
+
+// Obtener todas las ventas
+export const getVentas = async () => {
+  const res = await api.get("/ventas");
+  return res.data;
+};
 
 // Registrar una venta
-export const crearVenta = async ( { identificador, cantidad, motivo }) => {
-	try {
-		const res = await api.post('/ventas', {
-			identificador,
-			cantidad: Number(cantidad),
-			motivo
-		})
-		return res.data
-	} catch (err) {
-		console.error('Error al crear la venta' , err)
-		throw err
-	}
-}
+export const registrarVenta = async ({ identificador, cantidad, motivo }) => {
+  const res = await api.post("/ventas", {
+    identificador,
+    cantidad,
+    motivo,
+  });
+  return res.data;
+};
 
-// Obtener historial de ventas
-export const getVentas = async () => {
-	try {
-		const res = await api.get('/ventas')
-		return res.data
-	} catch (err) {
-		console.error('Error al obtener las ventas', err)
-		throw err
-	}
-}
+// Obtener ventas por medicamento
+export const getVentasByMedicamento = async (identificador) => {
+  const res = await api.get(`/ventas/${identificador}`);
+  return res.data;
+};

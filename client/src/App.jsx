@@ -1,59 +1,58 @@
-// client/src/App.jsx
-import { Route, Routes, Navigate } from "react-router-dom";
+import { Routes, Route, Navigate } from "react-router-dom";
 import { useAuth } from "./context/AuthContext";
 
+// Páginas
 import LoginPage from "./pages/LoginPage";
-import DashboardPage from "./pages/DashboardPage";
-import RutaProtegida from "./components/RutaProtegida";
 import RegisterPage from "./pages/RegisterPage";
-import AlertasPage from "./pages/AlertasPage";
+import DashboardPage from "./pages/DashboardPage";
 import MedicamentosPage from "./pages/MedicamentosPage";
 import NuevoMedicamentoPage from "./pages/NuevoMedicamentoPage";
+import AlertasPage from "./pages/AlertasPage";
 import VentasPage from "./pages/VentasPage";
+import LaboratoriosPage from "./pages/LaboratoriosPage";
+
+// Componentes
+import RutaProtegida from "./components/RutaProtegida";
+import RutaAdmin from "./components/RutaAdmin"; // crear este archivo si no lo tenés
 
 function App() {
-  const { isAuthenticated, loading, isAdmin } = useAuth();
+  const { isAuthenticated, loading } = useAuth();
 
-  if (loading) return <div>Cargando...</div>;
+  if (loading) return <div className="container mt-5">Cargando...</div>;
 
   return (
     <Routes>
+      {/* PUBLICAS */}
       <Route
         path="/login"
-        element={isAuthenticated ? <Navigate to="/dashboard" /> : <LoginPage />}
+        element={isAuthenticated ? <Navigate to="/dashboard" replace /> : <LoginPage />}
       />
-
       <Route
         path="/register"
-        element={
-          isAuthenticated ? <Navigate to="/dashboard" /> : <RegisterPage />
-        }
+        element={isAuthenticated ? <Navigate to="/dashboard" replace /> : <RegisterPage />}
       />
 
-      {/* Rutas protegidas */}
+      {/* PROTEGIDAS */}
       <Route element={<RutaProtegida />}>
         <Route path="/dashboard" element={<DashboardPage />} />
 
-        {/* SOLO ADMIN */}
-        <Route
-          path="/medicamentos"
-          element={
-            isAdmin ? <MedicamentosPage /> : <Navigate to="/dashboard" />
-          }
-        />
-        <Route
-          path="/medicamentos/nuevo"
-          element={
-            isAdmin ? <NuevoMedicamentoPage /> : <Navigate to="/dashboard" />
-          }
-        />
+        {/* Rutas accesibles a Admin únicamente */}
+        <Route element={<RutaAdmin />}>
+          <Route path="/laboratorios" element={<LaboratoriosPage />} />
+          <Route path="/medicamentos/nuevo" element={<NuevoMedicamentoPage />} />
+        </Route>
 
-        {/* ADMIN + EMPLEADO */}
-        <Route path="/ventas" element={<VentasPage />} />
+        {/* Rutas accesibles a Admin y Empleado */}
+        <Route path="/medicamentos" element={<MedicamentosPage />} />
         <Route path="/alertas" element={<AlertasPage />} />
+        <Route path="/ventas" element={<VentasPage />} />
       </Route>
 
-      <Route path="*" element={<Navigate to="/login" />} />
+      {/* fallback: si está autenticado lo mandamos al dashboard, sino al login */}
+      <Route
+        path="*"
+        element={isAuthenticated ? <Navigate to="/dashboard" replace /> : <Navigate to="/login" replace />}
+      />
     </Routes>
   );
 }

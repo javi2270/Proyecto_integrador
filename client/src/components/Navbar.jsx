@@ -1,11 +1,10 @@
-// client/src/components/Navbar.jsx
 import React from "react";
-import { Navbar, Nav, Container, Button } from "react-bootstrap";
-import { NavLink, useNavigate } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { useAuth } from "../context/AuthContext";
+import { Navbar as BSNavbar, Nav, Container, Button } from "react-bootstrap";
 
-const AppNavbar = () => {
-  const { usuario, logout, isAdmin, isEmpleado } = useAuth();
+const Navbar = () => {
+  const { usuario, logout } = useAuth();
   const navigate = useNavigate();
 
   const handleLogout = () => {
@@ -13,58 +12,80 @@ const AppNavbar = () => {
     navigate("/login");
   };
 
+  const esAdmin = usuario?.rol?.nombre === "Administrador";
+
   return (
-    <Navbar bg="primary" variant="dark" expand="lg" className="mb-4 shadow-sm">
+    <BSNavbar bg="dark" variant="dark" expand="lg">
       <Container>
-        <Navbar.Brand as={NavLink} to="/dashboard" className="fw-bold">
-          SGMR Farmacia
-        </Navbar.Brand>
 
-        <Navbar.Toggle aria-controls="basic-navbar-nav" />
+        <BSNavbar.Brand as={Link} to="/dashboard">
+          SGMR
+        </BSNavbar.Brand>
 
-        <Navbar.Collapse id="basic-navbar-nav">
-          <Nav className="me-auto gap-2">
-            <Nav.Link as={NavLink} to="/dashboard">
-              Inicio
-            </Nav.Link>
+        <BSNavbar.Toggle aria-controls="nav" />
 
-            {/* SOLO ADMIN */}
-            {isAdmin && (
+        <BSNavbar.Collapse id="nav">
+          <Nav className="me-auto">
+
+            {usuario && (
               <>
-                <Nav.Link as={NavLink} to="/alertas">Alertas</Nav.Link>
-                <Nav.Link as={NavLink} to="/medicamentos">Medicamentos</Nav.Link>
+                <Nav.Link as={Link} to="/medicamentos">
+                  Medicamentos
+                </Nav.Link>
+
+                <Nav.Link as={Link} to="/ventas">
+                  Ventas
+                </Nav.Link>
+
+                <Nav.Link as={Link} to="/alertas">
+                  Alertas
+                </Nav.Link>
+
+                {esAdmin && (
+                  <>
+                    <Nav.Link as={Link} to="/laboratorios">
+                      Laboratorios
+                    </Nav.Link>
+
+                    <Nav.Link as={Link} to="/usuarios">
+                      Usuarios
+                    </Nav.Link>
+                  </>
+                )}
               </>
             )}
-
-            {/* EMPLEADO Y ADMIN */}
-            <Nav.Link as={NavLink} to="/ventas">Ventas</Nav.Link>
           </Nav>
 
-          {/* Usuario a la derecha */}
-          <Nav className="align-items-center gap-3 mt-3 mt-lg-0">
-            {usuario && (
-              <span className="text-light text-center text-lg-start">
-                <i className="bi bi-person-circle me-1"></i>
-                Hola, <strong>{usuario.nombre}</strong>
-                <span className="badge bg-light text-primary ms-2">
-                  {usuario.rol?.nombre}
+          <Nav>
+            {!usuario ? (
+              <>
+                <Nav.Link as={Link} to="/login">Iniciar Sesión</Nav.Link>
+                <Nav.Link as={Link} to="/register">Registrarse</Nav.Link>
+              </>
+            ) : (
+              <>
+                <span
+                  style={{
+                    color: "white",
+                    marginRight: "10px",
+                    fontWeight: "500",
+                  }}
+                >
+                  {usuario.nombre}
+                  {usuario.rol?.nombre && ` (${usuario.rol.nombre})`}
                 </span>
-              </span>
-            )}
 
-            <Button
-              variant="outline-light"
-              size="sm"
-              className="fw-bold"
-              onClick={handleLogout}
-            >
-              Salir
-            </Button>
+                <Button variant="outline-light" onClick={handleLogout}>
+                  Cerrar sesión
+                </Button>
+              </>
+            )}
           </Nav>
-        </Navbar.Collapse>
+
+        </BSNavbar.Collapse>
       </Container>
-    </Navbar>
+    </BSNavbar>
   );
 };
 
-export default AppNavbar;
+export default Navbar;

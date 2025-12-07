@@ -1,111 +1,69 @@
-import React, { useState, useEffect } from "react";
-import { getAlertas, marcarAlertaLeida } from "../services/alerta.service";
-import { Alert, Button, Container, Spinner } from "react-bootstrap";
+import React, { useEffect, useState } from "react";
+import {
+  getAlertasActivas,
+  marcarComoLeida,
+  //marcarTodasPorTipo,
+} from "../services/alerta.service";
 
 const AlertasPage = () => {
-  // memoria (estados)
-  const [alertas, setAlertas] = useState([]); // lista de alertas
-  const [loading, setLoading] = useState(true); // Esta cargando??
-  const [error, setError] = useState(null); // hubo error??
+  const [alertas, setAlertas] = useState([]);
 
-  // Accion inicial (Effect), se ejecuta una sola vez al entrar a la pagina
+  const cargarAlertas = async () => {
+    try {
+      const data = await getAlertasActivas();
+      setAlertas(data);
+    } catch (error) {
+      console.error("Error al cargar alertas:", error);
+    }
+  };
+
+  const marcarUna = async (id) => {
+    try {
+      await marcarComoLeida(id);
+      cargarAlertas();
+    } catch (error) {
+      console.error("Error al marcar alerta:", error);
+    }
+  };
+
+  //const marcarPorTipo = async (tipo) => {
+  //  try {
+  //    await marcarTodasPorTipo(tipo);
+  //    cargarAlertas();
+  //  } catch (error) {
+  //    console.error("Error al marcar alertas por tipo:", error);
+  //  }
+  //};
+
   useEffect(() => {
     cargarAlertas();
   }, []);
 
-  // Funcion para pedir los datos al service
-  const cargarAlertas = async () => {
-    try {
-      setLoading(true); // enciendo Spinner
-      const data = await getAlertas(); // pido datos
-      setAlertas(data); // guardo datos
-    } catch (err) {
-      console.error(err);
-      setError("No se pudieron cargar las alertas.");
-    } finally {
-      setLoading(false); // apago Spinner (siempre)
-    }
-  };
-
-  // Funcion para marcar como leida
-  const handleMarcarLeida = async (id) => {
-    try {
-      await marcarAlertaLeida(id); // Aviso a la API
-      cargarAlertas(); // Recargo la lista para ver los cambios
-    } catch (err) {
-      alert(`Error: ${err}.. Error al actualizar la alerta.`);
-    }
-  };
-
-  // Si está cargando, mostramos un spinner girando
-  if (loading)
-    return (
-      <Container className="mt-5 text-center">
-        <Spinner animation="border" variant="primary" />
-      </Container>
-    );
-
-  // Si hubo error, mostramos un cartel rojo
-  if (error)
-    return (
-      <Container className="mt-5">
-        <Alert variant="danger">{error}</Alert>
-      </Container>
-    );
-
-  // Si todo está bien, mostramos la lista
   return (
-    <Container className="mt-4">
-      <h2 className="mb-4">Panel de Alertas</h2>
+    <div>
+      <h2>Alertas Activas</h2>
 
-      {/* Si no hay alertas, mostramos cartel verde */}
       {alertas.length === 0 ? (
-        <Alert variant="success">
-          ¡Todo en orden! No hay alertas pendientes.
-        </Alert>
+        <p>No hay alertas activas.</p>
       ) : (
-        /* Si hay alertas, las recorremos con .map() */
-        <div className="d-flex flex-column gap-3">
-          {alertas.map((alerta) => (
-            <Alert
-              key={alerta._id}
-              variant={obtenerVariante(alerta.tipo)} // Color según tipo
-              className="d-flex justify-content-between align-items-center shadow-sm"
+        alertas.map((alerta) => (
+          <div key={alerta._id} className="alert alert-warning mt-2">
+            <strong>{alerta.tipo}:</strong> {alerta.mensaje}
+            <br />
+            {alerta.medicamento && (
+              <small>Medicamento: {alerta.medicamento.nombre}</small>
+            )}
+            <button
+              className="btn btn-sm btn-success d-block mt-3"
+              onClick={() => marcarUna(alerta._id)}
             >
-              <div>
-                <strong>{alerta.tipo}:</strong> {alerta.mensaje}
-                {/* Si es sobre un medicamento, mostramos detalle */}
-                {alerta.medicamento && (
-                  <div className="text-muted small mt-1">
-                    Medicamento: {alerta.medicamento.nombre}
-                  </div>
-                )}
-                <div className="text-muted" style={{ fontSize: "0.75rem" }}>
-                  {new Date(alerta.createdAt).toLocaleString()}
-                </div>
-              </div>
-
-              <Button
-                variant="outline-dark"
-                size="sm"
-                onClick={() => handleMarcarLeida(alerta._id)}
-              >
-                Marcar Leída
-              </Button>
-            </Alert>
-          ))}
-        </div>
+              Marcar como leída
+            </button>
+          </div>
+        ))
       )}
-    </Container>
+    </div>
   );
-};
-
-// funcion auxiliar para los colores
-const obtenerVariante = (tipo) => {
-  if (tipo === "Bajo Stock") return "warning"; // Amarillo
-  if (tipo === "Vencimiento Proximo") return "danger"; // Rojo
-  if (tipo === "Registro Temperatura") return "info"; //Azul
-  return "secondary"; // Gris
 };
 
 export default AlertasPage;
