@@ -20,3 +20,5 @@ const actualizarRol = async (req,res) => {
 usuarioController.actualizarRol = actualizarRol
 
 module.exports = usuarioController
+
+

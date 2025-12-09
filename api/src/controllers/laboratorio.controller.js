@@ -60,3 +60,5 @@ const deleteLaboratorio = async (req, res) => {
 laboratorioController.deleteLaboratorio = deleteLaboratorio
 
 module.exports = laboratorioController
+
+

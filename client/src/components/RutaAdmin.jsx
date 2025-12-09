@@ -12,3 +12,4 @@ const RutaAdmin = () => {
 };
 
 export default RutaAdmin;
+

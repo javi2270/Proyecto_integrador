@@ -15,3 +15,4 @@ export const registerService = async (nombre, email, password) => {
   });
   return res.data;
 };
+

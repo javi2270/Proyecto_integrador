@@ -17,3 +17,4 @@ export const eliminarLaboratorio = async (nombre) => {
   const res = await api.delete(`/laboratorios/${nombre}`);
   return res.data;
 };
+

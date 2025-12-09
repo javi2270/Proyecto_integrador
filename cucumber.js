@@ -9,3 +9,4 @@ module.exports = {
     require: ['features/step_definitions/**/*.js']
   }
 };
+

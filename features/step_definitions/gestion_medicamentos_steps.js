@@ -140,3 +140,4 @@ Then('el medicamento no aparece en el listado de medicamentos', async function (
   const count = await Medicamento.countDocuments();
   expect(count).to.equal(0);
 });
+
