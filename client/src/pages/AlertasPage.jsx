@@ -1,8 +1,7 @@
 import React, { useEffect, useState } from "react";
 import {
   getAlertasActivas,
-  marcarComoLeida,
-  //marcarTodasPorTipo,
+  marcarComoLeida
 } from "../services/alerta.service";
 
 const AlertasPage = () => {
@@ -25,15 +24,6 @@ const AlertasPage = () => {
       console.error("Error al marcar alerta:", error);
     }
   };
-
-  //const marcarPorTipo = async (tipo) => {
-  //  try {
-  //    await marcarTodasPorTipo(tipo);
-  //    cargarAlertas();
-  //  } catch (error) {
-  //    console.error("Error al marcar alertas por tipo:", error);
-  //  }
-  //};
 
   useEffect(() => {
     cargarAlertas();

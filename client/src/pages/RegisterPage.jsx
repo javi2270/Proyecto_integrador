@@ -23,7 +23,6 @@ const RegisterPage = () => {
     setError("");
 
     try {
-      // Aquí estaba tu error: llamabas a registerUser
       await registerService(formData.nombre, formData.email, formData.password);
 
       alert("Cuenta creada correctamente.");

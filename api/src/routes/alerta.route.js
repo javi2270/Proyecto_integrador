@@ -8,7 +8,5 @@ router.get('/', alertaController.getAlertasActivas);
 // Marcar una alerta
 router.patch('/:id/leida', alertaController.marcarComoLeida);
 
-// Marcar todas las alertas de un tipo
-//router.patch('/tipo/:tipo/leidas', alertaController.marcarPorTipo);
 
 module.exports = router;

@@ -1,69 +1,60 @@
 const medicamentoService = require('../services/medicamento.service');
 
-exports.getByIdentificador = async (req, res) => {
+exports.getByIdentificador = async (req, res, next) => {
   try {
     const { identificador } = req.params;
 
     const medicamento = await medicamentoService.getByIdentificador(identificador);
 
     if (!medicamento) {
-      return res.status(404).json({ message: "Medicamento no encontrado." });
+      throw { status:404, message: 'Medicamento no encontrado.' }
     }
 
-    return res.status(200).json(medicamento);
+    res.json(medicamento);
 
   } catch (error) {
-    return res.status(500).json({ message: error.message });
+    next(error)
   }
 };
 
-exports.getAllMedicamentos = async (req, res) => {
+exports.getAllMedicamentos = async (req, res, next) => {
   try {
     const medicamentos = await medicamentoService.getAll();
-    return res.status(200).json(medicamentos);
+    res.json(medicamentos);
   } catch (error) {
-    console.error("Error getAllMedicamentos:", error);
-    return res.status(500).json({ message: "Error interno del servidor." });
+    next(error)
   }
 };
 
-exports.addMedicamento = async (req, res) => {
+exports.addMedicamento = async (req, res, next) => {
   try {
     const resultado = await medicamentoService.create(req.body);
 
-    return res.status(resultado.tipo === "REACTIVADO" ? 200 : 201).json({
+    res.status(resultado.tipo === "REACTIVADO" ? 200 : 201).json({
       success: true,
       tipo: resultado.tipo,
       medicamento: resultado.medicamento,
     });
 
   } catch (error) {
-    console.error("Error en addMedicamento:", error);
-
     if (error.message === "DUPLICADO_ACTIVO") {
-      return res.status(409).json({
-        success: false,
-        message: "El medicamento ya existe con este código de barras.",
-      });
+      return next({ status:409, message: "El medicamento ya existe con este codigo de barras."})
     }
-
+ 
     if (error.code === 11000) {
-      return res.status(409).json({
-        success: false, 
-        message: "Código de barras ya registrado."
-      });
+      return next({ status:409, message: "Codigo de barras ya registrado."})
     }
 
-    return res.status(500).json({ success: false, message: "Error interno del servidor." });
+    next(error)
   }
-};
+}
 
-exports.getMedicamento = async (req, res) => {
+exports.getMedicamento = async (req, res, next) => {
   try {
     const { codigoBarras, nombre } = req.query;
 
     if (!codigoBarras && !nombre) {
-      return res.status(400).json({ message: "Debe proporcionar un código o nombre." });
+      throw { status:400, message: "Debe proporcionar un codigo o nombre." }
     }
 
     const medicamento = codigoBarras
@@ -71,48 +62,45 @@ exports.getMedicamento = async (req, res) => {
       : await medicamentoService.getByNombre(nombre);
 
     if (!medicamento) {
-      return res.status(404).json({ message: "Medicamento no encontrado." });
+      throw { status:404, message: "Medicamento no encontrado." }
     }
 
-    return res.status(200).json(medicamento);
+    res.json(medicamento)
 
   } catch (error) {
-    console.error("Error getMedicamento:", error);
-    return res.status(500).json({ message: "Error interno del servidor." });
+    next(error)
   }
 };
 
-exports.updateMedicamento = async (req, res) => {
+exports.updateMedicamento = async (req, res, next) => {
   try {
     const medic = await medicamentoService.update(req.params.codigoBarras, req.body);
 
     if (!medic) {
-      return res.status(404).json({ message: "Medicamento no encontrado." });
+      throw { status:404, message: "Medicamento no encontrado." }
     }
 
-    return res.status(200).json(medic);
+    res.json(medic);
 
   } catch (error) {
-    console.error("Error updateMedicamento:", error);
-    return res.status(400).json({ message: error.message });
+    next(error)
   }
 };
 
-exports.deleteMedicamento = async (req, res) => {
+exports.deleteMedicamento = async (req, res, next) => {
   try {
     const medic = await medicamentoService.remove(req.params.codigoBarras);
 
     if (!medic) {
-      return res.status(404).json({ message: "Medicamento no encontrado." });
+      throw { status:404, message: "Medicamento no encontrado." }
     }
 
-    return res.status(200).json({ message: "Medicamento eliminado correctamente" });
+    res.json({ message: "Medicamento eliminado correctamente" })
 
   } catch (error) {
-    console.error("Error deleteMedicamento:", error);
-    return res.status(400).json({ message: error.message });
+    next(error)
   }
-};
+}
 
 exports.registrarIngresoStock = async (req, res) => {
   try {
@@ -120,24 +108,20 @@ exports.registrarIngresoStock = async (req, res) => {
     const { cantidad } = req.body;
 
     if (!Number.isInteger(cantidad) || cantidad <= 0) {
-      return res.status(400).json({
-        message: "La cantidad debe ser un número entero positivo.",
-      });
+      throw { status:400, message: "La cantidad debe ser un numero entero positivo." }
     }
-
     const med = await medicamentoService.addStock(codigoBarras, cantidad);
 
     if (!med) {
-      return res.status(404).json({ message: "Medicamento no encontrado." });
+      throw { status:404, message: "medicamento no encontrado." }
     }
 
-    return res.status(200).json({
+    res.json({
       message: "Stock actualizado correctamente.",
       medicamento: med
     });
 
   } catch (error) {
-    console.error("Error registrarIngresoStock:", error);
-    return res.status(500).json({ message: "Error interno del servidor." });
+    next(error)
   }
-};
+}

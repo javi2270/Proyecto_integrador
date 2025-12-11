@@ -1,64 +1,67 @@
-const Laboratorio = require('../models/laboratorio.model')
+const Laboratorio = require('../models/laboratorio.model');
 
-const laboratorioController = {}
+const laboratorioController = {};
 
 // Obtener todos los laboratorios
-const getAllLaboratorios = async (req, res) => {
+laboratorioController.getAllLaboratorios = async (req, res, next) => {
     try {
-        const laboratorios = await Laboratorio.find()
-        res.status(200).json(laboratorios)
+        const laboratorios = await Laboratorio.find();
+        res.json(laboratorios);
     } catch (error) {
-        res.status(400).json({ message: error.message })
+        next(error);
     }
-}
-laboratorioController.getAllLaboratorios = getAllLaboratorios
+};
 
-// Crear un laboratorio
-const addLaboratorio = async (req, res) => {
-    const { nombre, direccion, telefono } = req.body
-
-    if (!nombre) {
-        return res.status(400).json({ message: "El nombre es obligatorio." })
-    }
-
+// Crear laboratorio
+laboratorioController.addLaboratorio = async (req, res, next) => {
     try {
-        const laboratorio = new Laboratorio({ nombre, direccion, telefono })
-        const nuevoLaboratorio = await laboratorio.save()
-        res.status(201).json(nuevoLaboratorio)
-    } catch (error) {
-        res.status(400).json({ message: error.message })
-    }
-}
-laboratorioController.addLaboratorio = addLaboratorio
+        const { nombre, direccion, telefono } = req.body;
 
-// Obtener laboratorio por NOMBRE
-const getLaboratorioByName = async (req, res) => {
-    try {
-        const laboratorio = await Laboratorio.findOne({ nombre: req.params.nombre })
-        if (!laboratorio) {
-            return res.status(404).json({ message: "Laboratorio no encontrado" })
+        if (!nombre) {
+            throw { status: 400, message: "El nombre es obligatorio." };
         }
-        res.status(200).json(laboratorio)
-    } catch (error) {
-        res.status(400).json({ message: error.message })
-    }
-}
-laboratorioController.getLaboratorioByName = getLaboratorioByName
 
-// Eliminar laboratorio por NOMBRE
-const deleteLaboratorio = async (req, res) => {
+        const laboratorio = new Laboratorio({ nombre, direccion, telefono });
+        const nuevoLaboratorio = await laboratorio.save();
+
+        res.status(201).json(nuevoLaboratorio);
+    } catch (error) {
+        next(error);
+    }
+};
+
+// Obtener laboratorio por nombre
+laboratorioController.getLaboratorioByName = async (req, res, next) => {
     try {
-        const laboratorio = await Laboratorio.findOneAndDelete({ nombre: req.params.nombre })
+        const { nombre } = req.params;
+
+        const laboratorio = await Laboratorio.findOne({ nombre });
+
         if (!laboratorio) {
-            return res.status(404).json({ message: "Laboratorio no encontrado" })
+            throw { status: 404, message: "Laboratorio no encontrado." };
         }
-        res.status(200).json({ message: "Laboratorio eliminado correctamente" })
+
+        res.json(laboratorio);
     } catch (error) {
-        res.status(400).json({ message: error.message })
+        next(error);
     }
-}
-laboratorioController.deleteLaboratorio = deleteLaboratorio
+};
 
-module.exports = laboratorioController
+// Eliminar laboratorio por nombre
+laboratorioController.deleteLaboratorio = async (req, res, next) => {
+    try {
+        const { nombre } = req.params;
 
+        const laboratorio = await Laboratorio.findOneAndDelete({ nombre });
 
+        if (!laboratorio) {
+            throw { status: 404, message: "Laboratorio no encontrado." };
+        }
+
+        res.json({ message: "Laboratorio eliminado correctamente." });
+    } catch (error) {
+        next(error);
+    }
+};
+
+module.exports = laboratorioController;

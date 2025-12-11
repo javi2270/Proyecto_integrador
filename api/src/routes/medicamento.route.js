@@ -1,5 +1,8 @@
 const { Router } = require("express");
 const medicamentoController = require("../controllers/medicamento.controller");
+const validate = require("../middlewares/validate");
+const { crearMedicamentoSchema, actualizarMedicamentoSchema } = require("../schemas/medicamento.schema");
+
 
 const router = Router();
 
@@ -13,12 +16,12 @@ router.get("/buscar/:identificador", medicamentoController.getByIdentificador);
 router.get("/", medicamentoController.getMedicamento);
 
 // Crear
-router.post("/", medicamentoController.addMedicamento);
+router.post("/",validate(crearMedicamentoSchema), medicamentoController.addMedicamento);
 
 // Actualizar
-router.put("/:codigoBarras", medicamentoController.updateMedicamento);
+router.put("/:codigoBarras", validate(actualizarMedicamentoSchema), medicamentoController.updateMedicamento);
 
-// Eliminar (soft delete)
+// Eliminar 
 router.delete("/:codigoBarras", medicamentoController.deleteMedicamento);
 
 // Ingreso de stock

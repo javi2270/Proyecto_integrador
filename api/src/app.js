@@ -46,6 +46,9 @@ app.use(express.urlencoded({ extended: true }));
 // Montar todas las rutas bajo /api
 app.use('/api', routes);
 
+const errorHandler = require('./middlewares/errorHandler')
+app.use(errorHandler)
+
 module.exports = {
     app,
     connectionMongo,
@@ -53,3 +56,4 @@ module.exports = {
     iniciarRevisionVencimientos,
     iniciarAlertaTemperaturaMensual
 };
+

@@ -13,7 +13,7 @@ import LaboratoriosPage from "./pages/LaboratoriosPage";
 
 // Componentes
 import RutaProtegida from "./components/RutaProtegida";
-import RutaAdmin from "./components/RutaAdmin"; // crear este archivo si no lo tenés
+import RutaAdmin from "./components/RutaAdmin"; 
 
 function App() {
   const { isAuthenticated, loading } = useAuth();
@@ -36,7 +36,7 @@ function App() {
       <Route element={<RutaProtegida />}>
         <Route path="/dashboard" element={<DashboardPage />} />
 
-        {/* Rutas accesibles a Admin únicamente */}
+        {/* Rutas accesibles a Admin unicamente */}
         <Route element={<RutaAdmin />}>
           <Route path="/laboratorios" element={<LaboratoriosPage />} />
           <Route path="/medicamentos/nuevo" element={<NuevoMedicamentoPage />} />
@@ -48,7 +48,7 @@ function App() {
         <Route path="/ventas" element={<VentasPage />} />
       </Route>
 
-      {/* fallback: si está autenticado lo mandamos al dashboard, sino al login */}
+      {/* si esta autenticado lo mandamos al dashboard, sino al login */}
       <Route
         path="*"
         element={isAuthenticated ? <Navigate to="/dashboard" replace /> : <Navigate to="/login" replace />}

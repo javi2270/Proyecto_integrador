@@ -53,7 +53,7 @@ Before(async () => {
   });
   await usuarioEmpleado.save();
 
-  world = {}; // reset world
+  world = {}; 
 });
 
 // ================== STEP DEFINITIONS ==================

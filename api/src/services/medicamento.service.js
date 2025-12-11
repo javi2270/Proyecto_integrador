@@ -16,7 +16,6 @@ const getByNombre = async (nombre) => {
     .populate("laboratorio", "nombre");
 };
 
-// requerido por ventas
 const getByIdentificador = async (identificador) => {
   return await Medicamento.findOne({
     activo: true,

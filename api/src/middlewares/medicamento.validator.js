@@ -1,7 +1,6 @@
-// api/src/middlewares/medicamento.validator.js
 const Joi = require('joi');
 
-// Esquema para creación
+// Esquema para creacion
 const crearSchema = Joi.object({
   nombre: Joi.string().min(1).max(200).required(),
   codigoBarras: Joi.string().min(8).max(50).required(),
@@ -12,7 +11,7 @@ const crearSchema = Joi.object({
   laboratorio: Joi.string().required(),
 });
 
-// Esquema para actualización (parcial)
+// Esquema para actualizacion
 const actualizarSchema = Joi.object({
   nombre: Joi.string().min(1).max(200).optional(),
   lote: Joi.string().min(1).max(100).optional(),

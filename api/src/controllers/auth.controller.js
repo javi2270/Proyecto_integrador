@@ -1,39 +1,46 @@
 require("dotenv").config();
 const { Usuario, Rol } = require("../models/index");
-const bcryptjs = require("bcryptjs");
-const jsonwebtoken = require("jsonwebtoken");
+const bcrypt = require("bcryptjs");
+const jwt = require("jsonwebtoken");
 
 const authController = {};
 
 // -------------------- REGISTRO --------------------
-const register = async (req, res) => {
+authController.register = async (req, res, next) => {
   try {
     const { nombre, email, password } = req.body;
 
+    // Joi validó campos → solo verificamos duplicado
     const usuarioExistente = await Usuario.findOne({ email });
     if (usuarioExistente) {
-      return res.status(400).json({ message: "El correo electrónico ya está en uso." });
+      throw { status: 400, message: "El correo electrónico ya está en uso." };
     }
 
-    const passwordHasheada = await bcryptjs.hash(password, 10);
+    // Hash de contraseña
+    const passwordHasheada = await bcrypt.hash(password, 10);
 
+    // Obtener rol base
     const rolEmpleado = await Rol.findOne({ nombre: "Empleado" });
+    if (!rolEmpleado) {
+      throw { status: 500, message: "Rol base 'Empleado' no encontrado." };
+    }
 
-    const nuevoUsuario = new Usuario({
+    // Crear usuario
+    const nuevoUsuario = await Usuario.create({
       nombre,
       email,
       password: passwordHasheada,
       rol: rolEmpleado._id,
     });
 
-    await nuevoUsuario.save();
-
-    const token = jsonwebtoken.sign(
+    // Generar token
+    const token = jwt.sign(
       { id: nuevoUsuario._id },
       process.env.JWT_SECRET,
       { expiresIn: "24h" }
     );
 
+    // Traer usuario con rol
     const usuarioConRol = await Usuario.findById(nuevoUsuario._id)
       .populate("rol", "nombre");
 
@@ -43,40 +50,36 @@ const register = async (req, res) => {
     });
 
   } catch (error) {
-    console.error("Error en el registro:", error);
-    res.status(500).json({ message: "Error en el servidor al intentar registrar el usuario." });
+    next(error);
   }
 };
 
-authController.register = register;
-
 // -------------------- LOGIN --------------------
-const login = async (req, res) => {
+authController.login = async (req, res, next) => {
   try {
     const { email, password } = req.body;
 
-    const usuarioEncontrado = await Usuario.findOne({ email });
-    if (!usuarioEncontrado) {
-      return res.status(400).json({ message: "Credenciales inválidas." });
+    // Buscar usuario
+    const usuario = await Usuario.findOne({ email });
+    if (!usuario) {
+      throw { status: 400, message: "Credenciales inválidas." };
     }
 
-    const esPasswordCorrecta = await bcryptjs.compare(
-      password,
-      usuarioEncontrado.password
-    );
-
-    if (!esPasswordCorrecta) {
-      return res.status(400).json({ message: "Credenciales inválidas." });
+    // Validar password
+    const passwordOK = await bcrypt.compare(password, usuario.password);
+    if (!passwordOK) {
+      throw { status: 400, message: "Credenciales inválidas." };
     }
 
-    const token = jsonwebtoken.sign(
-      { id: usuarioEncontrado._id },
+    // Generar token
+    const token = jwt.sign(
+      { id: usuario._id },
       process.env.JWT_SECRET,
       { expiresIn: "24h" }
     );
 
-    // 👁️ AQUI ESTABA EL PROBLEMA: SOLO EL LOGIN SI POPULABA ROL
-    const usuarioConRol = await Usuario.findById(usuarioEncontrado._id)
+    // Usuario con rol poblado
+    const usuarioConRol = await Usuario.findById(usuario._id)
       .populate("rol", "nombre");
 
     res.status(200).json({
@@ -85,32 +88,25 @@ const login = async (req, res) => {
     });
 
   } catch (error) {
-    console.error("Error en el login:", error);
-    res.status(500).json({ message: "Error en el servidor al intentar iniciar sesión." });
+    next(error);
   }
 };
-
-authController.login = login;
 
 // -------------------- PROFILE --------------------
-const profile = async (req, res) => {
+authController.profile = async (req, res, next) => {
   try {
-    // 🚀 AGREGADO → Buscar SIEMPRE al usuario CON ROL POPULADO
-    const usuarioConRol = await Usuario.findById(req.usuario._id)
+    const usuario = await Usuario.findById(req.usuario._id)
       .populate("rol", "nombre");
 
-    if (!usuarioConRol) {
-      return res.status(404).json({ message: "Usuario no encontrado" });
+    if (!usuario) {
+      throw { status: 404, message: "Usuario no encontrado." };
     }
 
-    res.json(usuarioConRol);
+    res.json(usuario);
 
   } catch (error) {
-    console.error("Error en profile:", error);
-    res.status(500).json({ message: "Error al obtener el perfil" });
+    next(error);
   }
 };
-
-authController.profile = profile;
 
 module.exports = authController;

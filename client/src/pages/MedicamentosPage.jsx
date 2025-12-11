@@ -53,7 +53,6 @@ const MedicamentosPage = () => {
     <Container className="mt-4">
       <h2>Medicamentos</h2>
 
-      {/* BOTÓN NUEVO */}
       {usuario?.rol?.nombre === "Administrador" && (
         <Row className="mb-3">
           <Col>

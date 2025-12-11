@@ -4,8 +4,6 @@ const { Usuario } = require('../models/index');
 const ADMINISTRADOR = 'Administrador';
 
 const validarRegistro = (req, res, next) => {
-  // (Suponemos que ya existe registroSchema en schemas)
-  // Esta función fue manejada en otro archivo; aquí dejamos la pasantía mínima
   next();
 };
 

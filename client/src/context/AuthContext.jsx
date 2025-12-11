@@ -18,7 +18,7 @@ export const AuthProvider = ({ children }) => {
     const res = await api.post("/auth/login", { email, password });
     localStorage.setItem("token", res.data.token);
 
-    // 🔥 Obtenemos el usuario desde /profile para consistencia
+    // Obtengo el usuario desde /profile para consistencia
     const perfil = await api.get("/auth/profile");
     setUsuario(perfil.data);
 
@@ -31,7 +31,7 @@ export const AuthProvider = ({ children }) => {
     setUsuario(null);
   };
 
-  // Verificación automática
+  // Verificacion automatica
   useEffect(() => {
     const verificar = async () => {
       const token = localStorage.getItem("token");

@@ -1,11 +1,11 @@
 import axios from "axios";
 
 const api = axios.create({
-  baseURL: "/api",      // Vite proxy
+  baseURL: "/api",      
   withCredentials: true,
 });
 
-// Agregamos el token a cada request
+// Agrego el token a cada request
 api.interceptors.request.use(
   (config) => {
     const token = localStorage.getItem("token");

@@ -1,23 +1,20 @@
-/* client/src/index.css */
-
-/* 1. Reseteamos márgenes básicos */
 body {
   margin: 0;
   padding: 0;
   min-height: 100vh;
-  background-color: #f8f9fa; /* Un gris muy clarito de fondo */
+  background-color: #f8f9fa;
 }
 
-/* 2. Aseguramos que la App ocupe todo el ancho */
+
 #root {
   width: 100%;
   max-width: 100%;
   margin: 0;
   padding: 0;
-  text-align: left; /* Vite suele ponerlo 'center' */
+  text-align: left; 
 }
 
-/* (Opcional) Un efecto suave para cuando cargan las páginas */
+
 .fade-in {
   animation: fadeIn 0.5s ease-in;
 }

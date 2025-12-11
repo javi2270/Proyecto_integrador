@@ -45,13 +45,5 @@ const marcarComoLeida = async (id) => {
 };
 alertaService.marcarComoLeida = marcarComoLeida;
 
-// Marcar todas las de un tipo como leídas
-//const marcarPorTipo = async (tipo) => {
-//    return await Alerta.updateMany(
-//        { tipo, leida: false },
-//        { leida: true }
-//    );
-//};
-//alertaService.marcarPorTipo = marcarPorTipo;
 
 module.exports = alertaService;
