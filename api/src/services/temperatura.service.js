@@ -1,19 +1,32 @@
-const Temperatura = require('../models/temperatura.model')
+const Temperatura = require('../models/temperatura.model');
 
-const temperaturaService = {}
+const temperaturaService = {};
 
-const registrarTemperatura = async (datos) => {
+// Validar si ya existe un registro en el mes y crear uno nuevo si no existe
+temperaturaService.registrarTemperatura = async ({ valor, usuarioId }) => {
+  const ahora = new Date();
+  const primerDia = new Date(ahora.getFullYear(), ahora.getMonth(), 1);
+  const ultimoDia = new Date(ahora.getFullYear(), ahora.getMonth() + 1, 0);
 
-    const { valor, usuarioId } = datos
+  // 1️ Verificar si ya hay registro este mes
+  const existente = await Temperatura.findOne({
+    createdAt: { $gte: primerDia, $lte: ultimoDia }
+  });
 
-    const nuevoRegistro = new Temperatura({
-        valor: valor,
-        usuario: usuarioId
-    })
+  if (existente) {
+    throw { 
+      status: 400, 
+      message: 'Ya existe un registro de temperatura para este mes.' 
+    };
+  }
 
-    return await nuevoRegistro.save()
-}
-temperaturaService.registrarTemperatura = registrarTemperatura
+  // Crear nuevo registro
+  const nuevoRegistro = new Temperatura({
+    valor,
+    usuario: usuarioId
+  });
 
-module.exports = temperaturaService
+  return await nuevoRegistro.save();
+};
 
+module.exports = temperaturaService;

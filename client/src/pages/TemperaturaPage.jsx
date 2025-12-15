@@ -12,13 +12,15 @@ const TemperaturaPage = () => {
     setError("");
 
     if (!valor) return setError("Ingrese un valor.");
+    if (valor < 2 || valor > 8)
+      return setError("La temperatura debe estar entre 2°C y 8°C.");
 
     try {
       const res = await registrarTemperatura(Number(valor));
       setMsg("Temperatura registrada correctamente.");
       setValor("");
     } catch (err) {
-      setError("No se pudo registrar.");
+      setError(err.response?.data?.message || "No se pudo registrar.");
     }
   };
 
@@ -35,6 +37,8 @@ const TemperaturaPage = () => {
           type="number"
           value={valor}
           onChange={(e) => setValor(e.target.value)}
+          min={2}
+          max={8}
         />
       </Form.Group>
 

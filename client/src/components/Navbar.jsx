@@ -29,31 +29,20 @@ const Navbar = () => {
 
             {usuario && (
               <>
-                <Nav.Link as={Link} to="/medicamentos">
-                  Medicamentos
-                </Nav.Link>
-
-                <Nav.Link as={Link} to="/ventas">
-                  Ventas
-                </Nav.Link>
-
-                <Nav.Link as={Link} to="/alertas">
-                  Alertas
-                </Nav.Link>
+                <Nav.Link as={Link} to="/medicamentos">Medicamentos</Nav.Link>
+                <Nav.Link as={Link} to="/ventas">Ventas</Nav.Link>
+                <Nav.Link as={Link} to="/alertas">Alertas</Nav.Link>
 
                 {esAdmin && (
                   <>
-                    <Nav.Link as={Link} to="/laboratorios">
-                      Laboratorios
-                    </Nav.Link>
-
-                    <Nav.Link as={Link} to="/usuarios">
-                      Usuarios
-                    </Nav.Link>
+                    <Nav.Link as={Link} to="/laboratorios">Laboratorios</Nav.Link>
+                    <Nav.Link as={Link} to="/usuarios">Usuarios</Nav.Link>
+                    <Nav.Link as={Link} to="/temperatura">Temperatura</Nav.Link>
                   </>
                 )}
               </>
             )}
+
           </Nav>
 
           <Nav>

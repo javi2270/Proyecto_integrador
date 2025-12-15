@@ -3,7 +3,10 @@ const Medicamento = require('../models/medicamento.model');
 const alertaService = require('./alerta.service');
 const Temperatura = require('../models/temperatura.model');
 
-const iniciarRevisionVencimientos = () => {
+const cronService = {};
+
+//  Revisión de vencimientos cada minuto 
+cronService.iniciarRevisionVencimientos = () => {
   cron.schedule('* * * * *', async () => {
     console.log('Ejecutando revisión de vencimientos...');
     const hoy = new Date();
@@ -25,8 +28,11 @@ const iniciarRevisionVencimientos = () => {
   });
 };
 
-const iniciarAlertaTemperaturaMensual = () => {
-  cron.schedule('* * * * *', async () => {
+// Revisión mensual de temperatura (1 vez al mes)
+cronService.iniciarAlertaTemperaturaMensual = () => {
+
+  // Ejecuta el 1° de cada mes a las 00:00
+  cron.schedule('0 0 1 * *', async () => {
     console.log('Revisión mensual de temperatura...');
 
     try {
@@ -50,4 +56,4 @@ const iniciarAlertaTemperaturaMensual = () => {
   });
 };
 
-module.exports = { iniciarRevisionVencimientos, iniciarAlertaTemperaturaMensual };
+module.exports = cronService;

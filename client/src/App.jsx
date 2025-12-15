@@ -10,10 +10,12 @@ import NuevoMedicamentoPage from "./pages/NuevoMedicamentoPage";
 import AlertasPage from "./pages/AlertasPage";
 import VentasPage from "./pages/VentasPage";
 import LaboratoriosPage from "./pages/LaboratoriosPage";
+import UsuariosPage from "./pages/UsuariosPage";
+import TemperaturaPage from "./pages/TemperaturaPage";
 
 // Componentes
 import RutaProtegida from "./components/RutaProtegida";
-import RutaAdmin from "./components/RutaAdmin"; 
+import RutaAdmin from "./components/RutaAdmin";
 
 function App() {
   const { isAuthenticated, loading } = useAuth();
@@ -27,6 +29,7 @@ function App() {
         path="/login"
         element={isAuthenticated ? <Navigate to="/dashboard" replace /> : <LoginPage />}
       />
+
       <Route
         path="/register"
         element={isAuthenticated ? <Navigate to="/dashboard" replace /> : <RegisterPage />}
@@ -36,26 +39,31 @@ function App() {
       <Route element={<RutaProtegida />}>
         <Route path="/dashboard" element={<DashboardPage />} />
 
-        {/* Rutas accesibles a Admin unicamente */}
+        {/* ADMIN */}
         <Route element={<RutaAdmin />}>
           <Route path="/laboratorios" element={<LaboratoriosPage />} />
+          <Route path="/usuarios" element={<UsuariosPage />} />
+          <Route path="/temperatura" element={<TemperaturaPage />} />
           <Route path="/medicamentos/nuevo" element={<NuevoMedicamentoPage />} />
         </Route>
 
-        {/* Rutas accesibles a Admin y Empleado */}
+        {/* ADMIN y EMPLEADO */}
         <Route path="/medicamentos" element={<MedicamentosPage />} />
         <Route path="/alertas" element={<AlertasPage />} />
         <Route path="/ventas" element={<VentasPage />} />
       </Route>
 
-      {/* si esta autenticado lo mandamos al dashboard, sino al login */}
+      {/* Rutas inválidas */}
       <Route
         path="*"
-        element={isAuthenticated ? <Navigate to="/dashboard" replace /> : <Navigate to="/login" replace />}
+        element={
+          isAuthenticated
+            ? <Navigate to="/dashboard" replace />
+            : <Navigate to="/login" replace />
+        }
       />
     </Routes>
   );
 }
 
 export default App;
-
