@@ -1,7 +1,8 @@
-Feature: Gestión de Medicamentos
+Feature: Gestión de Medicamentos Refrigerados
   Para mantener un inventario preciso y funcional,
-  como empleado de farmacia, quiero poder registrar, actualizar y consultar
-  los medicamentos refrigerados del sistema.
+  como empleado o administrador
+  quiero registrar y consultar medicamentos refrigerados
+  para asegurar su correcta gestión.
 
   Scenario: Registro exitoso de un nuevo medicamento
     Given que he iniciado sesión como "Empleado"
@@ -22,4 +23,3 @@ Feature: Gestión de Medicamentos
     And presiono el botón "Guardar"
     Then el sistema muestra un mensaje de error "El campo \"nombre\" no puede estar vacío."
     And el medicamento no aparece en el listado de medicamentos
-

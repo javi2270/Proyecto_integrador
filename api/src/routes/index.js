@@ -1,14 +1,25 @@
 const { Router } = require('express');
 const router = Router();
 
-router.use('/auth', require('./auth.route'));
-router.use('/medicamentos', require('./medicamento.route'));
-router.use('/laboratorios', require('./laboratorio.route'));
-router.use('/ventas', require('./venta.route'));
-router.use('/alerta', require('./alerta.route'));
-router.use('/temperatura', require('./temperatura.route'));
-router.use('/usuarios', require('./usuario.route'));
-router.use('/temperatura-mes', require('./temperaturaMes.route'));
+const authRoutes = require('./auth.route');
+const usuarioRoutes = require('./usuario.route');
+const medicamentoRoutes = require('./medicamento.route');
+const laboratorioRoutes = require('./laboratorio.route');
+const alertaRoutes = require('./alerta.route');
+const temperaturaRoutes = require('./temperatura.route');
+const rolRoutes = require('./rol.route');
+const ventaRoutes = require('./venta.route'); // ← FALTABA
 
+// Auth
+router.use('/auth', authRoutes);
+
+// Protegidas
+router.use('/usuario', usuarioRoutes);
+router.use('/medicamento', medicamentoRoutes);
+router.use('/laboratorio', laboratorioRoutes);
+router.use('/alerta', alertaRoutes);
+router.use('/temperatura', temperaturaRoutes);
+router.use('/rol', rolRoutes);
+router.use('/venta', ventaRoutes); // ← CLAVE
 
 module.exports = router;

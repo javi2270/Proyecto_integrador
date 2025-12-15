@@ -8,7 +8,7 @@ temperaturaService.registrarTemperatura = async ({ valor, usuarioId }) => {
   const primerDia = new Date(ahora.getFullYear(), ahora.getMonth(), 1);
   const ultimoDia = new Date(ahora.getFullYear(), ahora.getMonth() + 1, 0);
 
-  // 1️ Verificar si ya hay registro este mes
+  // Verificar si ya hay registro este mes
   const existente = await Temperatura.findOne({
     createdAt: { $gte: primerDia, $lte: ultimoDia }
   });

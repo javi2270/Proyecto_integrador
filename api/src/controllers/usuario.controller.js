@@ -1,24 +1,41 @@
-const usuarioService = require('../services/usuario.service')
+const usuarioService = require('../services/usuario.service');
 
-const usuarioController = {}
+const usuarioController = {};
 
-const obtenerTodos = async (req, res) => {
-    const usuarios = await usuarioService.getAll()
-    res.status(200).json(usuarios)
-}
-usuarioController.obtenerTodos = obtenerTodos
+usuarioController.obtenerTodos = async (req, res, next) => {
+  try {
+    const usuarios = await usuarioService.getAll();
+    res.status(200).json(usuarios);
+  } catch (error) {
+    next(error);
+  }
+};
 
-const actualizarRol = async (req,res) => {
-    const { usuarioId } = req.params
-    const { rolId } = req.body
-    if (!rolId){
-        return res.status(400).json('Debe haber un rol')
+usuarioController.actualizarRol = async (req, res, next) => {
+  try {
+    const { usuarioId } = req.params;
+    const { rolId } = req.body;
+
+    if (!rolId) {
+      return res.status(400).json({
+        message: 'Debe indicar un rol'
+      });
     }
-    const usuarioActualizado = await usuarioService.cambiarRol(usuarioId, rolId)
-    res.status(200).json(usuarioActualizado)
-}
-usuarioController.actualizarRol = actualizarRol
 
-module.exports = usuarioController
+    // Admin no puede bajarse su propio rol
+    if (req.usuario._id.toString() === usuarioId) {
+      return res.status(403).json({
+        message: 'No puede modificar su propio rol de administrador'
+      });
+    }
 
+    const usuarioActualizado =
+      await usuarioService.cambiarRol(usuarioId, rolId);
 
+    res.status(200).json(usuarioActualizado);
+  } catch (error) {
+    next(error);
+  }
+};
+
+module.exports = usuarioController;

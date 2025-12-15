@@ -28,14 +28,10 @@ cronService.iniciarRevisionVencimientos = () => {
   });
 };
 
-// Revisión mensual de temperatura (1 vez al mes)
-cronService.iniciarAlertaTemperaturaMensual = () => {
-
-  // Ejecuta el 1° de cada mes a las 00:00
-  cron.schedule('0 0 1 * *', async () => {
-    console.log('Revisión mensual de temperatura...');
-
-    try {
+// Solo contiene la lógica, sin el cron ---
+cronService.verificarTemperaturaMensual = async () => {
+  console.log('Ejecutando verificación manual/automática de temperatura...');
+  try {
       const ahora = new Date();
       const primerDia = new Date(ahora.getFullYear(), ahora.getMonth(), 1);
       const ultimoDia = new Date(ahora.getFullYear(), ahora.getMonth() + 1, 0);
@@ -45,14 +41,23 @@ cronService.iniciarAlertaTemperaturaMensual = () => {
       });
 
       if (!registro) {
+        //Aquí el tipo es 'Registro Temperatura'
         await alertaService.crearAlertaSiNoExiste({
-          tipo: 'Registro Temperatura',
+          tipo: 'Registro Temperatura', 
           mensaje: 'Recordatorio: registrar la temperatura mensual del refrigerador.'
         });
       }
     } catch (error) {
       console.error('Error en alerta mensual:', error);
     }
+};
+
+// Revisión mensual de temperatura (El cron usa la función de arriba)
+cronService.iniciarAlertaTemperaturaMensual = () => {
+  // Ejecuta el 1° de cada mes a las 00:00
+  cron.schedule('0 0 1 * *', async () => {
+    console.log('Cron disparado: Revisión mensual de temperatura...');
+    await cronService.verificarTemperaturaMensual();
   });
 };
 

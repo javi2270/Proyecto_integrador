@@ -16,3 +16,8 @@ export const registerService = async (nombre, email, password) => {
   return res.data;
 };
 
+// obtener roles (para admin)
+export const getRoles = async () => {
+  const res = await api.get("/rol");
+  return res.data;
+};

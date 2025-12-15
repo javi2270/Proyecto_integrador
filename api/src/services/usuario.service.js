@@ -1,16 +1,36 @@
-const Usuario = require('../models/usuario.model')
+const Usuario = require('../models/usuario.model');
+const Rol = require('../models/rol.model');
 
-const usuarioService = {}
+const usuarioService = {};
 
-const getAll = async () => {
-    return await Usuario.find({}, {password: 0}).populate('rol') //oculta la password
-}
-usuarioService.getAll = getAll
+usuarioService.getAll = async () => {
+  return await Usuario
+    .find({}, { password: 0 })
+    .populate('rol');
+};
 
-const cambiarRol = async (usuarioId, nuevoRolId) => {
-    return await Usuario.findByIdAndUpdate(usuarioId,{rol: nuevoRolId}, {new: true})
-}
-usuarioService.cambiarRol = cambiarRol
+usuarioService.cambiarRol = async (usuarioId, nuevoRolId) => {
+  // Validar que el rol exista
+  const rol = await Rol.findById(nuevoRolId);
+  if (!rol) {
+    throw {
+      status: 404,
+      message: 'Rol no encontrado'
+    };
+  }
 
+  const usuario = await Usuario.findById(usuarioId);
+  if (!usuario) {
+    throw {
+      status: 404,
+      message: 'Usuario no encontrado'
+    };
+  }
 
-module.exports = usuarioService 
+  usuario.rol = rol._id;
+  await usuario.save();
+
+  return await usuario.populate('rol');
+};
+
+module.exports = usuarioService;

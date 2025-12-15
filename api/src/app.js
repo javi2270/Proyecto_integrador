@@ -8,7 +8,11 @@ require('dotenv').config({ path: path.resolve(__dirname, '../.env') });
 const routes = require('./routes');
 const { connectionMongo } = require('./db/mongo.db');
 const Rol = require('./models/rol.model');
-const { iniciarRevisionVencimientos, iniciarAlertaTemperaturaMensual } = require('./services/cron.service');
+const { 
+    iniciarRevisionVencimientos, 
+    iniciarAlertaTemperaturaMensual,
+    verificarTemperaturaMensual 
+} = require('./services/cron.service');
 
 // Crear roles iniciales si no existen
 const crearRolesIniciales = async () => {
@@ -46,14 +50,14 @@ app.use(express.urlencoded({ extended: true }));
 // Montar todas las rutas bajo /api
 app.use('/api', routes);
 
-const errorHandler = require('./middlewares/errorHandler')
-app.use(errorHandler)
+const errorHandler = require('./middlewares/errorHandler');
+app.use(errorHandler);
 
 module.exports = {
     app,
     connectionMongo,
     crearRolesIniciales,
     iniciarRevisionVencimientos,
-    iniciarAlertaTemperaturaMensual
+    iniciarAlertaTemperaturaMensual,
+    verificarTemperaturaMensual
 };
-
