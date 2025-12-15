@@ -2,13 +2,13 @@ import api from "./api";
 
 // Obtener todas las ventas
 export const getVentas = async () => {
-  const res = await api.get("/venta");
+  const res = await api.get("/ventas");
   return res.data;
 };
 
 // Registrar una venta
 export const registrarVenta = async ({ identificador, cantidad, motivo }) => {
-  const res = await api.post("/venta", {
+  const res = await api.post("/ventas", {
     identificador,
     cantidad,
     motivo,
@@ -18,6 +18,6 @@ export const registrarVenta = async ({ identificador, cantidad, motivo }) => {
 
 // Obtener ventas por medicamento
 export const getVentasByMedicamento = async (identificador) => {
-  const res = await api.get(`/venta/${identificador}`);
+  const res = await api.get(`/ventas/${identificador}`);
   return res.data;
 };

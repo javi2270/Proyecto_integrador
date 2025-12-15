@@ -60,11 +60,7 @@ Ejecuta el siguiente comando para levantar la base de datos en segundo plano:
 
 Para correr las pruebas automatizadas definidas en el sistema:
 
-1. Ve a la terminal de la carpeta api:
-```
-   cd api
-```
-2. Ejecuta el comando de test:
+1. Ve a la terminal de la carpeta sgmr y ejecuta el comando de test:
 ```
    npm test
 ```

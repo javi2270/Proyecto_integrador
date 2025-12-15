@@ -1,4 +1,4 @@
-const { Venta } = require('../models/index');
+const { Venta } = require('../models');
 const medicamentoService = require('../services/medicamento.service');
 const alertaService = require('../services/alerta.service');
 
@@ -9,53 +9,47 @@ ventaController.addVenta = async (req, res, next) => {
   try {
     const { identificador, cantidad, motivo } = req.body;
 
-    // Validaciones de entrada
-    if (!identificador || typeof identificador !== "string") {
-      throw { status: 400, message: "El identificador es obligatorio." };
-    }
-    if (!cantidad || cantidad <= 0) {
-      throw { status: 400, message: "La cantidad debe ser mayor a 0." };
-    }
-    if (!motivo || motivo.trim().length < 3) {
-      throw { status: 400, message: "El motivo es obligatorio." };
+    if (!identificador || typeof identificador !== 'string') {
+      return res.status(400).json({ message: 'El identificador es obligatorio.' });
     }
 
-    // Buscar medicamento
+    if (!cantidad || cantidad <= 0) {
+      return res.status(400).json({ message: 'La cantidad debe ser mayor a 0.' });
+    }
+
+    if (!motivo || motivo.trim().length < 3) {
+      return res.status(400).json({ message: 'El motivo es obligatorio.' });
+    }
+
     const medicamento = await medicamentoService.getByIdentificador(identificador);
     if (!medicamento) {
-      throw { status: 404, message: "Medicamento no encontrado." };
+      return res.status(404).json({ message: 'Medicamento no encontrado.' });
     }
 
-    // Validar stock
     if (medicamento.stock < cantidad) {
-      throw { status: 400, message: "Stock insuficiente." };
+      return res.status(400).json({ message: 'Stock insuficiente.' });
     }
 
-    // Actualizar stock
     medicamento.stock -= cantidad;
     await medicamento.save();
 
-    // Crear venta
-    const nuevaVenta = new Venta({
+    const nuevaVenta = await Venta.create({
       medicamento: medicamento._id,
       cantidad,
       motivo,
       usuario: req.usuario._id
     });
 
-    await nuevaVenta.save();
-
-    // Crear alerta si stock bajo
     if (medicamento.stock < medicamento.stockMinimo) {
       await alertaService.crearAlertaSiNoExiste({
         medicamento: medicamento._id,
-        tipo: "Bajo Stock",
+        tipo: 'Bajo Stock',
         mensaje: `Stock bajo para ${medicamento.nombre}.`
       });
     }
 
-    res.status(201).json({
-      message: "Venta registrada correctamente.",
+    return res.status(201).json({
+      message: 'Venta registrada correctamente.',
       venta: nuevaVenta
     });
 
@@ -68,10 +62,10 @@ ventaController.addVenta = async (req, res, next) => {
 ventaController.getAllVentas = async (req, res, next) => {
   try {
     const ventas = await Venta.find()
-      .populate("medicamento", "nombre codigoBarras")
-      .populate("usuario", "email nombre rol");
+      .populate('medicamento', 'nombre codigoBarras')
+      .populate('usuario', 'nombre email');
 
-    res.json(ventas);
+    return res.json(ventas);
   } catch (error) {
     next(error);
   }
@@ -84,15 +78,14 @@ ventaController.getVentasByMedicamento = async (req, res, next) => {
 
     const medicamento = await medicamentoService.getByIdentificador(identificador);
     if (!medicamento) {
-      throw { status: 404, message: "Medicamento no encontrado." };
+      return res.status(404).json({ message: 'Medicamento no encontrado.' });
     }
 
     const ventas = await Venta.find({ medicamento: medicamento._id })
-      .populate("medicamento", "nombre codigoBarras")
-      .populate("usuario", "email nombre rol");
+      .populate('medicamento', 'nombre codigoBarras')
+      .populate('usuario', 'nombre email');
 
-    res.json(ventas);
-
+    return res.json(ventas);
   } catch (error) {
     next(error);
   }

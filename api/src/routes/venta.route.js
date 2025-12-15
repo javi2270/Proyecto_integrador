@@ -8,7 +8,7 @@ const validate = require('../middlewares/validate');
 const { crearVentaSchema } = require('../schemas/venta.schema');
 const { identificadorParamSchema } = require('../schemas/ventaParam.schema');
 
-// Registrar una venta
+// Registrar una venta (HU07)
 router.post(
   '/',
   validarToken,
