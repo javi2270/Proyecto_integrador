@@ -1,7 +1,9 @@
 const mongoose = require("mongoose");
 
-const connectionMongo = async (isTest = false) => {
+const connectionMongo = async () => {
   try {
+    const isTest = process.env.NODE_ENV === 'test';
+
     const dbName = isTest
       ? process.env.MONGO_DB_NAME_TEST
       : process.env.MONGO_DB_NAME;
@@ -13,6 +15,7 @@ const connectionMongo = async (isTest = false) => {
     console.log(`Mongo conectado correctamente a la base: ${dbName}`);
   } catch (error) {
     console.error("Error al conectar a MongoDB:", error.message);
+    throw error;
   }
 };
 

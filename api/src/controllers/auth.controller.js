@@ -10,22 +10,22 @@ authController.register = async (req, res, next) => {
   try {
     const { nombre, email, password } = req.body;
 
-    // Joi validó campos → solo verificamos duplicado
     const usuarioExistente = await Usuario.findOne({ email });
     if (usuarioExistente) {
-      throw { status: 400, message: "El correo electrónico ya está en uso." };
+      return res.status(400).json({
+        message: "El correo electrónico ya está en uso.",
+      });
     }
 
-    // Hash de contraseña
     const passwordHasheada = await bcrypt.hash(password, 10);
 
-    // Obtener rol base
     const rolEmpleado = await Rol.findOne({ nombre: "Empleado" });
     if (!rolEmpleado) {
-      throw { status: 500, message: "Rol base 'Empleado' no encontrado." };
+      return res.status(500).json({
+        message: "Rol base 'Empleado' no encontrado.",
+      });
     }
 
-    // Crear usuario
     const nuevoUsuario = await Usuario.create({
       nombre,
       email,
@@ -33,18 +33,16 @@ authController.register = async (req, res, next) => {
       rol: rolEmpleado._id,
     });
 
-    // Generar token
     const token = jwt.sign(
       { id: nuevoUsuario._id },
       process.env.JWT_SECRET,
       { expiresIn: "24h" }
     );
 
-    // Traer usuario con rol
     const usuarioConRol = await Usuario.findById(nuevoUsuario._id)
       .populate("rol", "nombre");
 
-    res.status(201).json({
+    return res.status(201).json({
       token,
       usuario: usuarioConRol,
     });
@@ -59,30 +57,30 @@ authController.login = async (req, res, next) => {
   try {
     const { email, password } = req.body;
 
-    // Buscar usuario
     const usuario = await Usuario.findOne({ email });
     if (!usuario) {
-      throw { status: 400, message: "Credenciales inválidas." };
+      return res.status(400).json({
+        message: "Credenciales inválidas.",
+      });
     }
 
-    // Validar password
     const passwordOK = await bcrypt.compare(password, usuario.password);
     if (!passwordOK) {
-      throw { status: 400, message: "Credenciales inválidas." };
+      return res.status(400).json({
+        message: "Credenciales inválidas.",
+      });
     }
 
-    // Generar token
     const token = jwt.sign(
       { id: usuario._id },
       process.env.JWT_SECRET,
       { expiresIn: "24h" }
     );
 
-    // Usuario con rol poblado
     const usuarioConRol = await Usuario.findById(usuario._id)
       .populate("rol", "nombre");
 
-    res.status(200).json({
+    return res.status(200).json({
       token,
       usuario: usuarioConRol,
     });
@@ -99,10 +97,12 @@ authController.profile = async (req, res, next) => {
       .populate("rol", "nombre");
 
     if (!usuario) {
-      throw { status: 404, message: "Usuario no encontrado." };
+      return res.status(404).json({
+        message: "Usuario no encontrado.",
+      });
     }
 
-    res.json(usuario);
+    return res.json(usuario);
 
   } catch (error) {
     next(error);

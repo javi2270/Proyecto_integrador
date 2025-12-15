@@ -1,14 +1,9 @@
 {
   "name": "sgmr",
   "version": "1.0.0",
-  "description": "",
-  "main": "index.js",
   "scripts": {
-    "test": "cucumber-js"
+    "test": "NODE_ENV=test cucumber-js"
   },
-  "keywords": [],
-  "author": "",
-  "license": "ISC",
   "devDependencies": {
     "@cucumber/cucumber": "^12.2.0",
     "chai": "^4.3.10",
@@ -19,4 +14,3 @@
     "dotenv": "^17.2.1"
   }
 }
-

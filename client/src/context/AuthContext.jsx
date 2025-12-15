@@ -15,14 +15,22 @@ export const AuthProvider = ({ children }) => {
   const login = async (email, password) => {
     setLoading(true);
 
-    const res = await api.post("/auth/login", { email, password });
-    localStorage.setItem("token", res.data.token);
+    try {
+      const res = await api.post("/auth/login", { email, password });
+      localStorage.setItem("token", res.data.token);
 
-    // Obtengo el usuario desde /profile para consistencia
-    const perfil = await api.get("/auth/profile");
-    setUsuario(perfil.data);
-
-    setLoading(false);
+      // Obtener perfil para consistencia
+      const perfil = await api.get("/auth/profile");
+      setUsuario(perfil.data);
+    } catch (error) {
+      // Si falla el login, limpiamos estado y propagamos el error
+      localStorage.removeItem("token");
+      setUsuario(null);
+      throw error;
+    } finally {
+      // IMPORTANTE: evitar loading infinito
+      setLoading(false);
+    }
   };
 
   // LOGOUT
@@ -31,7 +39,7 @@ export const AuthProvider = ({ children }) => {
     setUsuario(null);
   };
 
-  // Verificacion automatica
+  // Verificación automática de sesión
   useEffect(() => {
     const verificar = async () => {
       const token = localStorage.getItem("token");

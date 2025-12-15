@@ -2,7 +2,6 @@ const express = require('express');
 const path = require('path');
 const cors = require("cors");
 
-// Cargar variables de entorno (.env)
 require('dotenv').config({ path: path.resolve(__dirname, '../.env') });
 
 const routes = require('./routes');
@@ -14,7 +13,6 @@ const {
     verificarTemperaturaMensual 
 } = require('./services/cron.service');
 
-// Crear roles iniciales si no existen
 const crearRolesIniciales = async () => {
     try {
         const count = await Rol.estimatedDocumentCount();
@@ -25,7 +23,7 @@ const crearRolesIniciales = async () => {
             new Rol({ nombre: 'Administrador' }).save()
         ]);
 
-        console.log('Roles iniciales creados: Empleado, Administrador');
+        console.log('Roles iniciales creados');
     } catch (error) {
         console.error('Error al crear roles iniciales:', error);
         throw error;
@@ -34,20 +32,15 @@ const crearRolesIniciales = async () => {
 
 const app = express();
 
-// Permitir conexión desde frontend (localhost:5173)
 app.use(cors({
     origin: "http://localhost:5173",
     methods: "GET,POST,PUT,PATCH,DELETE",
     allowedHeaders: "Content-Type, Authorization"
 }));
 
-// Middleware para parsear JSON
 app.use(express.json());
-
-// Middleware para parsear formularios
 app.use(express.urlencoded({ extended: true }));
 
-// Montar todas las rutas bajo /api
 app.use('/api', routes);
 
 const errorHandler = require('./middlewares/errorHandler');
